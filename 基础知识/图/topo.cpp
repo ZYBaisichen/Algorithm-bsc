@@ -23,7 +23,6 @@ vector<Node*> sortedTopology(Graph graph){
         }
 	}
 	//拓扑排序结果依次，存入result
-	vector<Node*> result;
 	while(!zeroInQueue.empty()){
 		//弹出入度为空节点的队列的一个节点到result里
 		Node* cur = zeroInQueue.front();
