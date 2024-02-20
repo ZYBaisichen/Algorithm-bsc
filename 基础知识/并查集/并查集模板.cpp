@@ -11,6 +11,8 @@
 #include "map"
 using namespace std;
 
+
+//标准C++工程级写法，但会卡常数时间；如果想达到acm级别的话需要改map为数组，尽量减少容器使用
 class UnionFind{
 public:
     UnionFind(vector<int>& nums) {
