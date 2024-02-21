@@ -404,6 +404,57 @@ public:
 	}
 };
 
+//https://leetcode.cn/problems/min-cost-to-connect-all-points/
+/*
+输入：points = [[3,12],[-2,5],[-4,1]]
+输出：18
+*/
+class Solution {
+public:
+	//无论K方法还是P方法，都需要将容器改为C风格数组。才能AC
+	//K算法
+    int minCostConnectPoints(vector<vector<int>>& points) {
+		int M = points.size();
+		if (M == 0) {
+			return 0;
+		}
+		int N = points[0].size();
+		if (N==0) {
+			return 0;
+		}
+		Graph graph;
+		graph.createGraphWithPoints(points);
+		const set<Edge*>& min_tree = Kruskal::kruskalMST(&graph);
+		int res = 0;
+		for (auto edge : min_tree) {
+			res += edge->value;
+		}
+		return res;
+
+    }
+
+	//P算法
+    int minCostConnectPoints(vector<vector<int>>& points) {
+		int M = points.size();
+		if (M == 0) {
+			return 0;
+		}
+		int N = points[0].size();
+		if (N==0) {
+			return 0;
+		}
+		Graph graph;
+		graph.createGraphWithPoints(points);
+		const set<Edge*>& min_tree = Prim::primSet(&graph);
+		int res = 0;
+		for (auto edge : min_tree) {
+			res += edge->value;
+		}
+		return res;
+
+    }
+};
+
 int main()
 {
 	
