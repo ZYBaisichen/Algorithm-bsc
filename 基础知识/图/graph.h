@@ -38,9 +38,13 @@ public:
 	vector<Node *> nexts; // 直接邻居，从当前node点出发链接的邻居
 	vector<Edge *> edges; // 从当前node点出发的边都记在edges里
 
-	Node(int value)
-	{
+	Node(int value) {
 		this->value = value;
+		this->in = 0;
+		this->out = 0;
+	}
+	Node() {
+		this->value = -1;
 		this->in = 0;
 		this->out = 0;
 	}
