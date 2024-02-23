@@ -60,6 +60,27 @@ public:
         s[i] = s[j];
         s[j] = tmp;
     }
+
+
+    //全排列去重版本
+    void generateAllPermutationDedupCore(string s, int i, vector<string>& res) {
+        int len = s.length();
+        if (i == len) {
+            res.push_back(s);
+            return;
+        }
+        
+        //分支限界，减枝
+        int visited[27] = {0};
+        for (int j=i;j<len;j++) {
+            if (visited[s[j]-'a'] == 0) { 
+                visited[s[j]-'a'] = 1;
+                swap(s, i,j);
+                generateAllPermutationCore(s,i+1,res); //枚举下一个位置的字符
+                swap(s, i,j);
+            }
+        }
+    }
 };
 int main()
 {
