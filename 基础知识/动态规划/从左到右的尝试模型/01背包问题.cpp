@@ -28,6 +28,7 @@ public:
     }
     // 将i...的物品在使用啦alreadyW重量后放入bag中产生的最大价值
     // 正着想，用了多少空间
+    //复杂度O(2^N)
     int process1(vector<int> &w, vector<int> &v, int index, int alreadyW, int bag)
     {
         if (alreadyW > bag)
@@ -72,6 +73,7 @@ public:
     }
 
     // 根据递归改造成动态规划版本
+    // 复杂度O(n*bag)
     int processDp(vector<int> w, vector<int> v, int bag)
     {
         int w_len = w.size();
