@@ -48,7 +48,7 @@ public:
         int ways = 0;
 
         ways += process1(x - 2, y - 1, rest - 1);
-        ways += process1(x - 2, y + 1 , rest - 1);
+        ways += process1(x - 2, y + 1, rest - 1);
         ways += process1(x - 1, y + 2, rest - 1);
         ways += process1(x + 1, y + 2, rest - 1);
         ways += process1(x + 2, y + 1, rest - 1);
@@ -61,7 +61,7 @@ public:
     //  递归版本2
     int HorseJump2(int x, int y, int k)
     {
-        return process2(x, y, k,0,0);
+        return process2(x, y, k, 0, 0);
     }
     // 要到达x，y，当前走到了curX、curY， 还有rest步可以走，有多少种走法。将第一种方法思维反了过来
     // x最大是8，y最大是9
@@ -91,32 +91,40 @@ public:
     //  dp版本2
     int HorseJump3(int x, int y, const int k)
     {
-        if (x < 0 || x > 8 || y < 0 || y > 9) {
+        if (x < 0 || x > 8 || y < 0 || y > 9)
+        {
             return 0;
         }
-        if (k == 0) {
+        if (k == 0)
+        {
             return 0;
         }
-    
+
         // 分配内存空间
-        int*** dp = new int**[9];
-        for (int i = 0; i < 9; ++i) {
+        int ***dp = new int **[9];
+        for (int i = 0; i < 9; ++i)
+        {
             dp[i] = new int*[10];
-            for (int j = 0; j < 10; ++j) {
-                dp[i][j] = new int[k+1];
-                for (int kk = 0; kk < k+1; ++kk) {
+            for (int j = 0; j < 10; ++j)
+            {
+                dp[i][j] = new int[k + 1];
+                for (int kk = 0; kk < k + 1; ++kk)
+                {
                     dp[i][j][kk] = 0;
                 }
             }
         }
 
         dp[0][0][0] = 1;
-        for (int level=1; level<=k; ++level) {
-            for (int i=0; i<9; ++i) {
-                for (int j=0; j<10; ++j) {
+        for (int level = 1; level <= k; ++level)
+        {
+            for (int i = 0; i < 9; ++i)
+            {
+                for (int j = 0; j < 10; ++j)
+                {
                     // cout << "dp[" << i << "][" << j << "][" << level << "]:" << dp[i][j][level] << endl;
-                    dp[i][j][level] = get_dp_value(i-2, j-1, level-1, dp);
-                    dp[i][j][level] += get_dp_value(i-2, j+1, level-1, dp);
+                    dp[i][j][level] = get_dp_value(i - 2, j - 1, level - 1, dp);
+                    dp[i][j][level] += get_dp_value(i - 2, j + 1, level - 1, dp);
                     dp[i][j][level] += get_dp_value(i - 1, j + 2, level - 1, dp);
                     dp[i][j][level] += get_dp_value(i + 1, j + 2, level - 1, dp);
                     dp[i][j][level] += get_dp_value(i + 2, j + 1, level - 1, dp);
@@ -129,11 +137,78 @@ public:
         return dp[x][y][k];
     }
 
-    int get_dp_value(int x, int y, int k, int*** dp) {
-        if (x < 0 || x > 8 || y < 0 || y > 9) {
+    int get_dp_value(int x, int y, int k, int ***dp)
+    {
+        if (x < 0 || x > 8 || y < 0 || y > 9)
+        {
             return 0;
         }
         return dp[x][y][k];
+    }
+
+    //  dp版本空间压缩
+    int HorseJump4(int x, int y, const int k)
+    {
+        if (x < 0 || x > 8 || y < 0 || y > 9)
+        {
+            return 0;
+        }
+        if (k == 0)
+        {
+            return 0;
+        }
+
+        // 分配内存空间
+        int **dp = new int*[9];
+        int **help = new int*[9];
+        for (int i = 0; i < 9; ++i)
+        {
+            dp[i] = new int[10];
+            help[i] = new int[10];
+            for (int j = 0; j < 10; ++j)
+            {
+                dp[i][j] = 0;
+                help[i][j] = 0;
+            }
+        }
+
+        dp[0][0] = 1;
+        for (int level = 1; level <= k; level++)
+        {
+            for (int i = 0; i < 9; ++i)
+            {
+                for (int j = 0; j < 10; ++j)
+                {
+                    // cout << "dp[" << i << "][" << j << "][" << level << "]:" << dp[i][j][level] << endl;
+                    help[i][j] = get_dp_value2(i - 2, j - 1, dp);
+                    help[i][j] += get_dp_value2(i - 2, j + 1, dp);
+                    help[i][j] += get_dp_value2(i - 1, j + 2, dp);
+                    help[i][j] += get_dp_value2(i + 1, j + 2, dp);
+                    help[i][j] += get_dp_value2(i + 2, j + 1, dp);
+                    help[i][j] += get_dp_value2(i + 2, j - 1, dp);
+                    help[i][j] += get_dp_value2(i + 1, j - 2, dp);
+                    help[i][j] += get_dp_value2(i - 1, j - 2, dp);
+                }
+            }
+            
+            for (int i = 0; i < 9; ++i) {
+                for (int j = 0; j < 10; ++j)
+                {
+                    dp[i][j] = help[i][j];
+                    help[i][j] = 0;
+                }
+            }
+        }
+
+        return dp[x][y];
+    }
+    int get_dp_value2(int x, int y, int **dp)
+    {
+        if (x < 0 || x > 8 || y < 0 || y > 9)
+        {
+            return 0;
+        }
+        return dp[x][y];
     }
 };
 
@@ -148,12 +223,14 @@ int main()
     int ans0 = 0;
     int ans1 = 0;
     int ans2 = 0;
+    int ans3 = 0;
 
     ans0 = sol.HorseJump1(x, y, k);
     ans1 = sol.HorseJump2(x, y, k);
     ans2 = sol.HorseJump3(x, y, k);
+    ans3 = sol.HorseJump4(x, y, k);
 
-    cout << "ans0:" << ans0 << " ans1:" << ans1 << " ans2:" << ans2 << endl;
+    cout << "ans0:" << ans0 << " ans1:" << ans1 << " ans2:" << ans2 << " ans3:" << ans3 << endl;
     cout << "测试结束" << endl;
     return 0;
 }
