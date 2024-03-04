@@ -102,49 +102,75 @@ public:
         }
         return res;
     }
+
+     string longestPalindrome_zuoshen(string s) {
+        int len = s.length();
+        if (len==0) {
+            return "";
+        }
+        
+        string ss = expand(s);
+        
+        int ss_len = ss.length();
+        vector<int> p(ss_len, 0);//以每个字符为中心的回文半径, 包括自身
+        int r = 0; //最右回文串的右边界的下一个位置
+        int c = -1; //最右回文串的中心点
+
+        int max_idx = 0;
+        for (int i=0, c=0, r=0, len; i< ss_len;i++) {
+            //i>=r，至少不用验证的区域是1
+            //i在r内的话, 不用验证的区域是i关于c对称点的回文半径，和r-i的最小值。(c=(i+x)/2 => x=2*c-i)
+            len = r > i ? min(p[2*c-i], r-i) : 1;
+            // cout << "1_len:" << len << " r:" << r << " i:" << i  << " c:" << c<< endl;
+            //不用验证的区域已经设置好了，则尝试往两边扩
+            while (i+len<ss_len && i-len>=0 && ss[i+len] == ss[i-len]) {
+                len++;
+            }
+            //当右边超过了r，则更新r和c
+            if (i + len > r) {
+                r = i + len;
+                c = i;
+            }
+            // cout << "2_len:" << len << " r:" << r << " i:" << i << " c:" << c << endl;
+            p[i] = len;
+            max_idx = p[max_idx] > len ? max_idx : i;
+        }
+        //"#a# b#a#"
+        //1 2 1 2 1 2 1
+        //c=1
+        //r=3
+        for (int i=0;i<ss_len;i++) {
+            cout << "p[" << i << "]:" << p[i] << " ";
+        }
+        cout << endl;
+
+        int res_l = max_idx - p[max_idx] + 1;
+        int res_r = max_idx + p[max_idx] - 1;
+        // cout << "res_l:" << res_l << " res_r:" << res_r << " max_idx:" << max_idx << endl;
+
+        string res="";
+        for (int i=res_l;i<=res_r;i++) {
+            if (ss[i] != '#') {
+                res += ss[i];
+            }
+        }
+        return res;
+    }
 };
 
 int main()
 {
     Solution sol;
-    //1 3 5 78 100
-    //60 90
-    // vector<int> arr = {3,5,1,100,78 ,60,90, 1,5,6,1,2,3};
-    // int test_time = 1000;
-    // int len = 0;
-    // int k= 0;
-
-    // int ans0 = 0;
-    // int ans1 = 0;
-    // int ans2 = 0;
-    // for (int i=0;i<test_time;i++) {
-    //     len = (int)((std::rand() % 100) + 1);
-    //     arr.resize(len);
-    //     for (int j=0;j<len;j++) {
-    //         arr[j] = (int)((std::rand() % 1000) + 1);
-    //     }
-    //     k = (int)((std::rand() % len)+1);
-    //     vector<int> arr1 = arr;
-    //     vector<int> arr2 = arr;
-    //     vector<int> arr3 = arr;
-
-    //     sol.select_sort(arr2, 0, arr2.size() - 1);
-    //     ans0 = arr2[k - 1];
-    //     ans1 = sol.get_k_with_bfprt(arr1, k);
-    //     ans2 = sol.get_k_with_rand(arr3, k);
-    //     if (ans0!=ans1) {
-    //         cout << " ans0:" << ans0 << " ans1:" << ans1 << endl;
-    //     }
-    //     if (ans0!=ans2) {
-    //         cout << " ans0:" << ans0 << " ans2:" << ans2 << endl;
-    //     }
-    // }
     string  s = "adcredfabccbakl";
     int k = 4;
     int ans1 = 0;
     //这个函数求的是假设将arr排序完成后，下标在k-1位置的数字
     string ans0 = sol.longestPalindrome(s);
+    string ans1 = sol.longestPalindrome_zuoshen(s);
 
     cout << " ans0:" << ans0 << endl;
+    cout << " ans1:" << ans1 << endl;
+
     cout << "测试结束" << endl;
 }
+
