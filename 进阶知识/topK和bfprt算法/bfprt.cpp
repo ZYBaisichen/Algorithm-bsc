@@ -18,26 +18,12 @@
 
 using namespace std;
 
-#include <iostream>
-#include <stack>
-#include <vector>
-#include <string>
-#include <set>
-#include <ctime>
-#include <cstdlib>
-#include <map>
-#include <limits.h>
-#include <deque>
-
-using namespace std;
-
-// 每次最少减少右侧3N/10的规模，每次选择出来的m左侧最多有7N/10
-// 将荷兰国旗方法的概率O(N)复杂度，变成了严格的O(N)复杂度。
 
 class Solution
 {
 public:
-    //严格O(N)复杂度
+    // 每次最少减少右侧3N/10的规模，每次选择出来的m左侧最多有7N/10
+    // 将荷兰国旗方法的概率O(N)复杂度，变成了严格的O(N)复杂度。
     int get_k_with_bfprt(vector<int>& arr, int k)
     {
         int len = arr.size();
@@ -49,7 +35,7 @@ public:
         return bfprt(arr, 0, len - 1, k-1);
     }
 
-    //笔试这样就已经足够快了
+    //笔试这样就已经足够快了。概率级别的O(N)
     int get_k_with_rand(vector<int> &arr, int k)
     {
         int len = arr.size();
