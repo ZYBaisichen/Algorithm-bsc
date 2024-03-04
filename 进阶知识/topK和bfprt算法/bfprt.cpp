@@ -37,6 +37,7 @@ using namespace std;
 class Solution
 {
 public:
+    //严格O(N)复杂度
     int get_k_with_bfprt(vector<int>& arr, int k)
     {
         int len = arr.size();
@@ -48,6 +49,7 @@ public:
         return bfprt(arr, 0, len - 1, k-1);
     }
 
+    //笔试这样就已经足够快了
     int get_k_with_rand(vector<int> &arr, int k)
     {
         int len = arr.size();
