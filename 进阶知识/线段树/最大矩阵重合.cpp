@@ -44,7 +44,12 @@ struct CompareByRight {
         return a->right > b->right; 
     }    
 };  
-  
+/*
+矩阵数量是n
+O(n*long(n))
++
+O(N)*[O(n) + O(n*long(n))]
+*/
 class Solution
 {
     
