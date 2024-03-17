@@ -12,6 +12,7 @@
 
 using namespace std;
 
+//https://leetcode.cn/problems/stream-of-characters/solutions/2187670/python3javacgo-yi-ti-yi-jie-qian-zhui-sh-79kg/
 class Node {
 public:
     string end;// 以当前节点结尾，这条线路的字符串
