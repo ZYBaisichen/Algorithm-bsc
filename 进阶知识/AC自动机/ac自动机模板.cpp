@@ -12,7 +12,8 @@
 
 using namespace std;
 
-//https://leetcode.cn/problems/stream-of-characters/solutions/2187670/python3javacgo-yi-ti-yi-jie-qian-zhui-sh-79kg/
+//例题: https://leetcode.cn/problems/stream-of-characters/description/ ， 注意这个题目中字符流可能会重复出现words中的字符串，所以不需要将描黑的end节点置为不黑
+
 class Node {
 public:
     string end;// 以当前节点结尾，这条线路的字符串
