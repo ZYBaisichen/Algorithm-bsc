@@ -84,6 +84,8 @@ public:
             }
             // 越界end到了len, 违规end也对
             res = max(res, end - i);
+
+            //以i开头的都试了一遍了，需要缩[i,end)的窗口了
             if (end > i)
             {                  // 窗口内还有数， [i, end) [4,4)
                 sum -= arr[i]; // 左边缩一下位置
