@@ -1,7 +1,7 @@
 /*
  * @Author: baisichen
  * @Date: 2024-03-13 10:34:12
- * @LastEditTime: 2024-03-14 00:12:28
+ * @LastEditTime: 2024-04-02 17:39:55
  * @LastEditors: baisichen
  * @Description:
  */
@@ -80,12 +80,12 @@ public:
             {
                 // cout << "end:" << end << endl;
                 sum += min_sum[end];
-                end = min_sum_end[end]+1;
+                end = min_sum_end[end] + 1;
             }
             // 越界end到了len, 违规end也对
             res = max(res, end - i);
 
-            //以i开头的都试了一遍了，需要缩[i,end)的窗口了
+            // 以i开头的都试了一遍了，需要缩[i,end)的窗口了
             if (end > i)
             {                  // 窗口内还有数， [i, end) [4,4)
                 sum -= arr[i]; // 左边缩一下位置
@@ -97,13 +97,70 @@ public:
         }
         return res;
     }
+
+    /*
+    O(n*log(n))解法
+    假设k=20，累加到了100，则问题就转化成了累加和>=80最早出现的位置。怎么样得到>=80的位置在哪里呢
+    使用一个help数组记录所有前缀数组。[3,2,8,4,6,9]
+    然后通过help加工出来一个help'，维持一个只升不降的数组[3,3,8,8,8,9]
+    当累加到10时，k=2，要求小于等于8最左的位置，这就可以二分查找了，总复杂度可以做到N*log(N)
+    */
+    int getLongest_sub_array_length_2(vector<int> &arr, int k)
+    {
+        int len = arr.size();
+        if (len == 0)
+        {
+            return 0;
+        }
+        vector<int> help(len, 0);
+        vector<int> help_1(len, 0);
+        int sum = arr[0];
+        help[0] = arr[0];
+        help_1[0] = arr[0];
+        for (int i = 1; i < len; i++)
+        {
+            sum += arr[i];
+            help[i] = sum;
+            help_1[i] = sum > help_1[i - 1] ? sum : help_1[i - 1];
+            cout << "i:" << i << " help[i]:" << help[i] << " help_1[i]:" << help_1[i] << endl;
+        }
+
+        int ans = 0; // 长度最短为0
+        sum = arr[0];
+        for (int i = 1; i < len; i++)
+        {
+            sum += arr[i];
+            int target = sum - k; // 找到大于等于sum-k最左的位置，比如累加到了100，要找到大于等于80最左的位置
+
+            int l = 0, r = i - 1, tmp_res = -1;
+            while (l <= r)
+            {
+                int mid = l + ((r - l) >> 1);
+                cout << "i:" << i << " mid:" << mid << " l:" << l << " r:" << r << " target:" << target << endl;
+                if (help_1[mid] >= target)
+                {
+                    tmp_res = mid;
+                    r = mid - 1;
+                } else {
+                    l = mid + 1;
+                }
+            }
+            if (tmp_res != -1)
+            { // 没有找到>=target最左的位置则不更新
+                ans = max(ans, (i - tmp_res + 1));
+            }
+            cout << "i:" << i << " ans:" << ans << " tmp_res:" << tmp_res <<endl;
+        }
+        return ans;
+    }
 };
 int main()
 {
-    vector<int> arr = {-1, 1, 1, -1,-1,6};
-    int k = 0;
+    vector<int> arr = {-1, 1, 1, -1, -1, 6};
+    int k = 3;
     Solution sol;
     cout << sol.getLongest_sub_array_length(arr, k) << endl;
+    cout << sol.getLongest_sub_array_length_2(arr, k) << endl;
 
     // int N,K;
     // cin >> N >> K;
