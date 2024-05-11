@@ -1,8 +1,8 @@
 /*
  * @Author: baisichen
  * @Date: 2024-02-26 15:02:38
- * @LastEditTime: 2024-05-09 17:21:16
- * @LastEditors: baisichen baisichen@baidu.com
+ * @LastEditTime: 2024-05-10 14:30:15
+ * @LastEditors: baisichen
  * @Description:
  */
 #include <iostream>
@@ -34,6 +34,7 @@ using namespace std;
 // 所以给一个N*4的矩阵，就可以代表N个项目。 给定一个正数pm，表示项目经理的数量，每个项目经理只负责自己的那些项目，
 // 并且一次只能提交一个项目 给程序员们，这个提交的项目做完了，才能再次提交。
 // 经理对项目越喜欢，就会越早提交。一个项目优先级越高越被喜欢;如果优先级一样，花费时间越少越喜欢;
+
 // 如果还一样，被项目经理润色出来的时间点越早越喜欢。给定一个正数sde，表示程序员的数量，所有经理提交了的项目，
 // 程序员会选自己喜欢的项目做，每个人做 完了一个项目，然后才会再来挑选。当程序员在挑选项目时，有自己的喜欢标准。
 // 一个项目花费时间越少越被喜欢;如果花费时间一样，该项目的负责人编号越小越被喜欢。
@@ -110,8 +111,8 @@ public:
             pm_heap.push_back(priority_queue<Program*, vector<Program*>, PmCompare>(pm_compare));
         }
         sde_heap.resize(pms);//每个pms最多提一个最喜欢的
-        indexes.resize(pms);
-        for (int i=0;i<pms;i++) {
+        indexes.resize(pms+1);
+        for (int i=0;i<=pms;i++) {
             indexes[i] = -1;
         }
         heap_size = 0;
@@ -150,12 +151,17 @@ public:
     void add(Program* program) { //添加一个项目
         auto& pm_queue = pm_heap[program->pm];
         pm_queue.push(program);
-        cout << "[add]:" << program->pm <<endl;
+        // cout << "[add]:" << program->pm <<endl;
 
         //下面将当前最喜欢的项目入程序员堆
         Program* cur_pm_top = pm_queue.top();
         int heap_idx = indexes[cur_pm_top->pm];
-        cout << "[add] pm:" << program->pm << " heap_idx:" << heap_idx <<endl;
+        // cout << "[add] pm:" << program->pm << " cur_pm_top->pm:" << cur_pm_top->pm << " heap_idx:" << heap_idx << endl;
+        // cout << "[add] indexes:";
+        // for (int i=0;i<indexes.size();i++) {
+        //     cout << i << "," << indexes[i] << " ";
+        // }
+        // cout << endl;
         if (heap_idx == -1) { //还没有入过堆
             sde_heap[heap_size] = cur_pm_top;
             indexes[cur_pm_top->pm] = heap_size;
@@ -264,6 +270,7 @@ public:
         //     start_queue.pop();
         //     cout << tmp->idx << ": "<< tmp->pm << ", " << tmp->start << ", " << tmp->rank << ", " << tmp->cost << endl;
         // }
+        // return vector<int>();
         //所有的项目在最开始时都在programsQueue中被锁住
 
         // //程序员唤醒堆
@@ -282,20 +289,25 @@ public:
                 if (start_queue.top()->start > sde_wake_time) {
                     break;
                 }
+                auto tmp = start_queue.top();
+                cout << "big_queue add:" << " sde_wake_time:" << sde_wake_time << " :"<< tmp->pm << ","<< tmp->start << "," << tmp->rank << "," << tmp->cost << endl;
                 big_que.add(start_queue.top());
                 start_queue.pop();
             }
-            big_que.print_heap();
+            // big_que.print_heap();
+            // break;
 
-            // if (big_que.is_empty()) {//员工醒的时候，没有项目被润色出来。即没有项目可以做。则将这个程序员的唤醒时间放置到第一个项目开始的时候
-            //     sde_que.push(start_queue.top()->start);
-            // } else {
-            //     Program* program = big_que.pop(); //拿出来一个项目做
-            //     cout << "cur run program:" << program->idx << ", " << program->pm << ", " << program->start << ", " << program->rank << ", " << program->cost << endl;
-            //     ans[program->idx] = sde_wake_time + program->cost; //程序员醒来开始做的时间，加上花费的时间，就是该项目结束的时间
-            //     sde_que.push(ans[program->idx]); //这个程序员醒来的时间将是结束时间
-            //     finish++;
-            // }
+            if (big_que.is_empty()) {//员工醒的时候，没有项目被润色出来。即没有项目可以做。则将这个程序员的唤醒时间放置到第一个项目开始的时候
+                auto tmp = start_queue.top();
+                cout << "big_queue get_next start:" << " sde_wake_time:" << sde_wake_time << " :" << tmp->pm << "," << tmp->start << "," << tmp->rank << "," << tmp->cost << endl;
+                sde_que.push(start_queue.top()->start);
+            } else {
+                Program* program = big_que.pop(); //拿出来一个项目做
+                cout << "big_queue process program:" << " sde_wake_time:" << sde_wake_time << " :" << program->idx << ", " << program->pm << ", " << program->start << ", " << program->rank << ", " << program->cost << endl;
+                ans[program->idx] = sde_wake_time + program->cost; //程序员醒来开始做的时间，加上花费的时间，就是该项目结束的时间
+                sde_que.push(ans[program->idx]); //这个程序员醒来的时间将是结束时间
+                finish++;
+            }
         }
         return ans;
     }
@@ -315,12 +327,13 @@ int main()
     Solution sol;
     int pms = 2;
     int sde = 2;
+    // 项目经理编号、润色出来的时间点、优先级、花费程序员时间
     vector<vector<int>> programs = { 
-        { 1, 1, 1, 2 }, 
-        // { 1, 2, 1, 1 }, 
-        // { 1, 3, 2, 2 }, 
-        { 2, 1, 1, 2 }, 
-        // { 2, 3, 5, 5 } 
+        { 1, 1, 1, 3 }, 
+        { 1, 2, 1, 1 }, 
+        { 1, 3, 2, 2 }, 
+        // { 2, 1, 1, 2 }, 
+        { 2, 3, 5, 5 } 
         };
     vector<int> ans = sol.work_finish(pms, sde, programs);
     print_array(ans);
