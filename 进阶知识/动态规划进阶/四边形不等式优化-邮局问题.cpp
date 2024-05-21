@@ -90,11 +90,12 @@ k=3代表一共要建的邮局数量。每个邮局只能建在居民点上，�
 对于每个dp[i][j]将依赖前一列的所有的行，是N规模的。假设dp的格子数量是N*k的，如果不优化的话，总复杂度达到了O(N^2*k)
 
 可以使用四边形不等式的特征：
-1. 每个各自有枚举行为
-2. 每个格子的值，对n和k有一种说不清道不明的单调关系。且是相反的。
+1. 枚举行为：每个各自有枚举行为
+2. 单调性：每个格子的值，对n和k有一种说不清道不明的单调关系。且是相反的。
     1) 比如0..7上有2个邮局，那么增加一个居民点，总距离肯定增加，即0...8上有2个邮局。正向
     2) 0..8上有2个邮局，增加1个邮局时，总距离肯定会变小。负向
 3. 区间划分问题
+4. 求一个格子时，不同时依赖本行的值和本列的值。比如邮局问题的dp[i][j]只依赖左上角值
 
 
 假设，居民点个数是0...5的，邮局有3个，求dp[5][3]。
@@ -103,13 +104,15 @@ k=3代表一共要建的邮局数量。每个邮局只能建在居民点上，�
     3. dp[5][3]的上方dp[4][3], 是0..4范围上放3个邮局, 此时最后一个邮局的位置在k位置。当增加一个居民点时，最后一邮局的位置肯定在k及其右边
     4. dp[5][3]的右边dp[5][4]，是0..5范围上放4个邮局，此时最后一个邮局的位置在kk位置。当减少一个邮局是，最后一个邮局的位置肯定在kk的左边
     5. 这样上方确定了最后一个邮局位置的下限，右方确定了最后一个邮局位置的上限
+    6. 所以使用一个choose数组，记录[i][j](0..i号居民点建j个邮局最后一个邮局所在位置)。
+    7. 填dp[i][j]格子时，只依赖左上角dp[i-1...0][j-1]的值，所以对于每一行，从右往左。每一列从上往下，这样每一个位置都可以拿到上方和下方的上下限做优化
 
 */
 
 class Solution
 {
 public:
-    int minDistance(vector<int>& arr, int num) {
+    int minDistanceOrigin(vector<int>& arr, int num) { //86ms
         int n = arr.size();
         if (n==0) {
             return 0;
@@ -131,7 +134,7 @@ public:
             for (int j=2;j<=min(i, num);j++) { //邮局数量到num或者i
                 dp[i][j] = record[0][i];//0...i范围只分最后一个邮局
                 cout << "i:" << i << " j:" << j  << " first:" << dp[i][j]<<endl;
-                //枚举最后一个邮局负责的范围，k..i
+                //枚举最后一个邮局负责的范围，i..0
                 //四边形不等式可以对这个枚举进行优化
                 for (int k=i;k>0;k--) {
                     //0...k-1上用j-1个邮局覆盖
@@ -178,16 +181,80 @@ public:
         // cout << endl;
     }
 
+    //复杂度是O(N*m)，枚举范围会越来越小。
+    int minDistance(vector<int>& arr, int num) { //7ms
+        int n = arr.size();
+        if (n==0) {
+            return 0;
+        }
+        sort(arr.begin(), arr.end());
+        vector<vector<int>> record(n, vector<int>(n,0));
+        get_record(arr, record);
+
+        //dp[...][0]0个邮局不需要填都是0
+        //dp[0][...]0个居民点也不需要填都是0
+        vector<vector<int>> dp(n, vector<int>(num+1,0));
+
+        //choose[i][j]在求dp[i][j]，最优解情况下，最后一个邮局负责了k...i范围的居民点，则将这个k记录到choose[i][j]中。
+        //第0行，不管有多少邮局，最后邮局位置都在0位置
+        //第0列不需要填
+        vector<vector<int>> choose(n, vector<int>(num+1,0));
+
+
+        //第一列
+        for (int i=0;i<n;i++) {
+            dp[i][1] = record[0][i];
+            choose[i][1] = 0; //只有一个邮局，负责0...i范围，将最右边居民点的位置记录到choose位置上
+        }
+
+        //i个居民点，建i个邮局时总距离也是0
+        for (int i=1;i<n;i++) {
+            for (int j=min(i, num);j>=2;j--) { //从右往左求
+                int down = choose[i-1][j]; //上方
+                int up = j == min(i, num) ? i : choose[i][j+1]; //k取值最大为i，当右边没有格子时，取最大值i
+                dp[i][j] = record[0][i];//0...i范围只分最后一个邮局。 此时choose[i][j]应该为0，因为初始化就是0，这里就不显示写了
+                // cout << "i:" << i << " j:" << j << " down:" << down << " up:" << up << endl;
+                for (int k=max(down, 1); k<=up;k++) {
+                    // cout << "i:" << i << " j:" << j << " down:" << down << " up:" << up << " k:"<<k <<  endl;
+                    if (dp[k-1][j-1] + record[k][i]<dp[i][j]) {
+                        choose[i][j] = k;
+                        dp[i][j] = dp[k-1][j-1] + record[k][i];
+                    }
+                }
+            }
+        }
+
+        // cout << "dp:" << endl;
+        // for (int i=0;i<n;i++) {
+        //     for (int j=0;j<=num;j++) {
+        //         cout << dp[i][j] << " ";
+        //     }
+        //     cout << endl;
+        // }
+        // cout << endl;
+
+        // cout << "choose:" << endl;
+        // for (int i=0;i<n;i++) {
+        //     for (int j=0;j<=num;j++) {
+        //         cout << choose[i][j] << " ";
+        //     }
+        //     cout << endl;
+        // }
+        // cout << endl;
+        return dp[n-1][num];
+    }
+
 
 };
 
 int main() {
     Solution sol;
-    // vector<int> arr = {3,18,105,877,987,1003};
-    // int num = 3;
+    vector<int> arr = {3,18,105,877,987,1003};
+    int num = 3;
     // //答案118
 
-    vector<int> arr = {1, 8, 12, 10, 3};
-    int num = 3;
+    // vector<int> arr = {1, 8, 12, 10, 3};
+    // int num = 3;
+    cout << sol.minDistanceOrigin(arr, num) << endl;
     cout << sol.minDistance(arr, num) << endl;
 }
