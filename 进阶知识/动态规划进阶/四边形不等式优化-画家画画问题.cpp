@@ -13,197 +13,242 @@
 using namespace std;
 
 /*
-* Description: 测试链接：https://leetcode.cn/problems/split-array-largest-sum/
- * 给定一个整型数组 arr，数组中的每个值都为正数，表示完成一幅画作需要的时间，再给定一个整数num
- * 表示画匠的数量，每个画匠只能画连在一起的画作
- * 所有的画家并行工作，返回完成所有的画作需要的最少时间
- * arr=[3,1,4]，num=2。
- * 最好的分配方式为第一个画匠画3和1，所需时间为4
- * 第二个画匠画4，所需时间为4
- * 所以返回4
- * arr=[1,1,1,4,3]，num=3
- * 最好的分配方式为第一个画匠画前三个1，所需时间为3
- * 第二个画匠画4，所需时间为4
- * 第三个画匠画3，所需时间为3
- * 返回4
+ * Description: https://leetcode.cn/problems/super-egg-drop/
+ * 一座大楼有0~N层，地面算作第0层，最高的一层为第N层
+ * 已知棋子从第0层掉落肯定不会摔碎，从第i层掉落可能会摔碎，也可能不会摔碎(1≤i≤N)
+ * 给定整数N作为楼层数，再给定整数K作为棋子数
+ * 返回如果想找到棋子不会摔碎的最高层数，即使在最差的情况下扔的最少次数.
+ * <p>
+ * 一次只能扔一个棋子
+ * N=10，K=1
+ * 返回10
+ * 因为只有1棵棋子，所以不得不从第1层开始一直试到第10层
+ * 在最差的情况下，即第10层是不会摔坏的最高层，最少也要扔10次
+ * <p>
+ * N=3，K=2
+ * 返回2
+ * 先在2层扔1棵棋子，如果碎了试第1层，如果没碎试第3层
+ * N=105，K=2
+ * 返回14
+ * 
+
+
+力扣原题描述：
+ 给你 k 枚相同的鸡蛋，并可以使用一栋从第 1 层到第 n 层共有 n 层楼的建筑。
+
+已知存在楼层 f ，满足 0 <= f <= n ，任何从 高于 f 的楼层落下的鸡蛋都会碎，从 f 楼层或比它低的楼层落下的鸡蛋都不会破。
+
+每次操作，你可以取一枚没有碎的鸡蛋并把它从任一楼层 x 扔下（满足 1 <= x <= n）。如果鸡蛋碎了，你就不能再次使用它。如果某枚鸡蛋扔下后没有摔碎，则可以在之后的操作中 重复使用 这枚鸡蛋。
+
+请你计算并返回要确定 f 确切的值 的 最小操作次数 是多少？
+
+ 
+示例 1：
+
+输入：k = 1, n = 2
+输出：2
+解释：
+鸡蛋从 1 楼掉落。如果它碎了，肯定能得出 f = 0 。 
+否则，鸡蛋从 2 楼掉落。如果它碎了，肯定能得出 f = 1 。 
+如果它没碎，那么肯定能得出 f = 2 。 
+因此，在最坏的情况下我们需要移动 2 次以确定 f 是多少。 
+示例 2：
+
+输入：k = 2, n = 6
+输出：3
+示例 3：
+
+输入：k = 3, n = 14
+输出：4
+ 
+
+提示：
+
+1 <= k <= 100
+1 <= n <= 104
 */
 
 /*
-每个画家负责的范围，总时间是sum_i，要求的即是min{max{sum_0,sum_1...sum_i}}。是将数组分成2块问题扩展到了k块问题
+难点在于最差情况不知道在哪里。假设只有一个棋子，只能从第一层开始试，一直最多试n次。
 
+大前提：如果k>log(n)，二分肯定可以试出来，棋子数量足够二分
+试法：第一颗棋子扔哪里(业务限制模型)
+    1. f(i,j)还剩i层楼，还有j个棋子，需要最少试几次。比如在99层楼不碎，还剩100-104个楼层需要尝试，有3个棋子。那么可以调f(5,3)
+    2. 假设还剩100层楼需要试(还剩5颗棋子)，此时的最低楼层是a，a以下的楼层都是不碎的。当第一颗棋子仍在了a处。两种情况
+        a. 在a层棋子碎了：则a-1层一定是最高的不碎楼层，扔了1次。还剩0层需要试，还有4个棋子, 后续需要扔的次数是f(0,4)
+        b. 在a层棋子没有碎：后续需要扔的次数是f(99,5)
+        c. 当前的解是1+max(f(99,5), f(0,4))。之所以要取max，是因为小的解是可能的，但不是必然的。答案是需要在必然能试出来最小不会碎的楼层的前提下的最小尝试次数。
+    3. 对于f(7,2)，还剩7层楼需要试，有2个棋子
+        a. 第一颗棋子扔在1位置，碎了还需要f(0,1)，没碎需要f(6,1)次。共需要1+max(f(0,1),f(6,1))
+        b. 第一颗棋子扔在2位置，碎了还需要f(1,1)，没碎需要f(5,1)次。共需要1+max(f(1,1),f(5,1))
+        c. 第一颗棋子扔在3位置，碎了还需要f(2,1)，没碎需要f(4,1)次。共需要1+max(f(2,1),f(4,1))
+        ...
 
-dp[i][j] 0...i幅画，分j个画家，结束时间。dp[n][num]就是答案
-dp[...][0]，0个画家，结束时间无穷大
-dp[0][1...] 只有一幅画，结束时间都是arr[0]
-dp[i][j], 看最后一个画家负责范围， 以dp[7][3]: 
-    1. 最后一个画家，负责第7幅画，前6幅画由2个画家负责，结束时间是max{arr[7], dp[6][2]}
-    2. 最后一个画家，负责6..7幅画，前5幅画由2个画家负责，结束时间是max{sum[6...7], dp[5][2]} 
-    3. 最后一个画家，负责5..7幅画，前4幅画由2个画家负责，结束时间是max{sum[5...7], dp[4][2]} 
-    ...
-综上，dp的求解过程满足以下特征：
-    1. 枚举行为
-    2. dp[i][j]依赖左上角的值，不同时依赖本行和本列
-    3. 单调性：0..6上有2个画家，当再加一个画家时，结束时间肯定会变小；0...6上有3个画家，当减少一个画家时，总时间肯定会增加
-    4. 区间划分
-所以可以用四边形不等式优化dp[i][j]的枚举过程，以dp[7][3]为例：
-    1. 上边的格子dp[6][3]代表0...6范围上有3个画家，当增加一幅画时，最后一个画家所负责范围不需要往左挪动
-    2. 右边格子dp[7][4]代表0...7上有4个画家，当减少一个画家时，最后一个画家所负责范围，往右不会超过有4个画家时所负责的范围。
-    3. dp从右往左，从上往下枚举计算
-
-
-拓展：dp[i][j]依赖本行左边的值，且依赖左上角的值，则可以用左边和下边的值推四边形不等式。
-上左行不行？得具体问题具体分析。
+        d. 以上结果求min(a,b,c,.....)就是f(7,2)的结果
+    4. base cashe: 还剩0层楼时f(0,i)=0；当棋子数是1时f(i,1)=i
 */
 
-/*
-最优解：找到一个合适的划块累加和目标，看能划分多少块
-nums = [3,2,4,2,3,1,3,1,4,1], k=2. 对画划块，假设每一块目标不超过t=5。
-在每个块累加和都不超过5且最长的情况下，nums可以分成[3,2][4][2,3][1,3,1][4,1] 5块，说明目标定的太小了，2个人无法在5时完成。
 
-
-总的累加和是sum，可以通过二分找到合适的目标，先定t=sum/2
-1.还是以上面的nums为例，总累计和sum=24，t=12，可以分成[3,2,4,2][3,1,3,1,4][1] 3块。需要3个人，说明t还是小了，要想12这个时间点完成，至少需要3个画家
-2.下一步在t=(t+sum)/2 = 18，可以分成[3,2,4,2,3,1,3][1,4,1]两块，2个人能完成，找到了一个答案，总时间是18
-3. 在13-18中间再找重点t=15, 可以分成[3,2,4,2,3,1][3,1,4,1]两块，2个人也能完成，总时间是15，更新答案
-4. ... 一直二分直到只剩一个数了
-5. 对sum二分，每次二分遍历一遍数组，总复杂度是O(N*log(sum)) ，sum即使来到了long类型最大，log(sum)最大也才64
-6. 之所以能对sum二分找目标，是因为结束时间目标越大，需要的画家数量越少；越小需要的画家数量越多。这样的单调性。
-
-
-注：对比两种方法，最优复杂度上限来源于试法，比如dp的试法不管怎么优化都不如好的试法。
-*/
-typedef long long ll;
 class Solution {
 public:
-    //四边形等式优化的解，但不是最优解。presum复杂度O(N), 填dp复杂度O(N*k)
-    int splitArray_sibianxing(vector<int>& nums, int k) {
-        int len = nums.size();
-        if (len == 0) {
+    int superEggDrop_baoli(int k, int n) {
+        if(n==0) {
             return 0;
         }
+        if (k==1) {
+            return n;
+        }
+        return process(n, k);
+    }
 
-        //使用前缀和计算任何一个范围上所需要的和
-        vector<int> presum(len+1, 0);
-        for (int i=0;i<len;i++) {
-            presum[i+1] = presum[i] + nums[i];
+    //还剩n层楼，还有k颗棋子，需要最少试几次。
+    int process(int rest, int k) {
+        //还剩0层，不需要试
+        if (rest == 0) {
+            return 0;
         }
-        // for (int i=0;i<=len;i++) {
-        //     cout << presum[i] << " ";
-        // }
-        // cout << endl;
-        vector<vector<int>> dp(len, vector<int>(k+1, 0));
-        //求dp[i][j]最优解时，最后一个画家负责kk...i范围上的画，将kk记录到choose[i][j]里
-        vector<vector<int>> choose(len, vector<int>(k+1, 0));
+        //1个棋子，只能挨个试rest次
+        if (k==1) {
+            return rest;
+        }
 
-        for (int i=0;i<len;i++) {
-            dp[i][0] = INT_MAX;
+        int ans = INT_MAX;
+        for (int i=1;i<=rest;i++) {
+            ans = min(ans, max(process(i-1,k-1), process(rest-i, k))); //碎了和没碎取最大值
         }
-        //一幅画时
-        for (int j=1;j<=k;j++) {
-            dp[0][j] = nums[0];
-            choose[0][j] = 0;
-        }
-        //一个画家时
-        for (int i=1;i<len;i++) {
-            dp[i][1] = presum[i+1];
-            choose[i][1] = 0; //一个画家负责所有的，所以最右边画家负责的范围左边界是0位置
-        }
-        // cout << "before dp:" << endl;
-        // for (int i=0;i<len;i++) {
-        //     for (int j=0;j<=k;j++) {
-        //         cout << dp[i][j] << " ";
-        //     }
-        //     cout << endl;
-        // }
-        // cout << endl;
+        // cout << "rest:" << rest << ", k:" << k << ", ans:" << ans+1 << endl;
+        return ans+1; //加上当前层试的1次
+    }
 
-        for (int i=1;i<len;i++) {
-            for (int j=k;j>=2;j--) {
-                int down = choose[i-1][j];//下界
-                int up = j == k ? i : choose[i][j+1];
-                dp[i][j] = presum[i+1];//最后一个邮局负责0...i, chooose[i][j]=0
-                for (int kk=max(down, 1);kk<=up;kk++) { //上面单伶出来了0...i，所以从1..i开始试
-                    int tmp = max(presum[i+1]-presum[kk], dp[kk-1][j-1]); //kk...i的累加和，还有0...kk-1幅画有j-1个画家负责，j最小取值2，所以j-1至少有一个画家
-                    if (dp[i][j] > tmp) { //发现了更好的答案
-                        dp[i][j] = tmp;
-                        choose[i][j] = kk;
-                    }
+
+    //枚举行为会超时，复杂度O(n^2*k)
+    int superEggDrop_dp(int k, int n) {
+        if(n==0) {
+            return 0;
+        }
+        if (k==1) {
+            return n;
+        }
+
+        //dp[i][j]代表还剩i层楼，还有j颗棋子，需要最少试几次。
+        vector<vector<int>> dp(n+1, vector<int>(k+1, 0));
+        //第0行，0层楼，需要试0次
+
+        //一个棋子，第一列
+        for (int i=1;i<=n;i++) {
+            dp[i][1] = i;
+        }
+        //依赖上方格子和左方格子，所以从上到下，从左到右枚举
+        for (int i=1;i<=n;i++) {
+            for (int j=2;j<=k;j++) {
+                int ans = INT_MAX;
+                for (int kk=1;kk<=i;kk++) {
+                    // cout << "i:" << i << ", j:" << j << ", kk:" << kk << " :" << dp[i-1][j-1] <<","<< dp[i-kk][j]<< endl;
+                    ans = min(ans, max(dp[kk-1][j-1], dp[i-kk][j]));
                 }
+                dp[i][j] = ans+1;
             }
         }
-        // cout << "after dp:" << endl;
-        // for (int i=0;i<len;i++) {
+
+        // cout << "dp:" << endl;
+        // for (int i=0;i<=n;i++) {
         //     for (int j=0;j<=k;j++) {
         //         cout << dp[i][j] << " ";
         //     }
         //     cout << endl;
         // }
-        // cout << endl;
-        // cout << "choose:" << endl;
-        // for (int i=0;i<len;i++) {
+        // cout<< endl;
+        return dp[n][k];
+    }
+    /*
+    四边形不等式优化
+    以dp[7][2]为例, 依赖的格子为(求min)：
+        1+max{dp[0][1], dp[6][2]} //扔第1层，碎了依赖dp[0][1];没碎，依赖dp[6][2]
+        1+max{dp[1][1], dp[5][2]} //扔第2层
+        1+max{dp[2][1], dp[4][2]} //扔第3层
+        1+max{dp[3][1], dp[3][2]} //扔第4层
+        1+max{dp[4][1], dp[2][2]} //扔第5层
+        1+max{dp[5][1], dp[1][2]} //扔第6层
+        1+max{dp[6][1], dp[0][2]} //扔第7层
+    dp[7][2]需要枚举本列往上，和左上角往上所有格子。
+    符合的特征：
+        1. 有枚举行为
+        2. 假设有100层楼，有3个棋子，当增加一个棋子时，尝试的次数会变小，减少一个棋子尝试次数会增加（极端情况时剩一颗棋子尝试次数会变得很大); 当增加楼层时，尝试次数会变多，减少楼层尝试次数会变小。
+        3. 区间划分问题
+        4. 不同时依赖本行和本列的值：依赖本行，但不依赖本列
+
+    因为枚举的是第一个棋子扔的位置，对于dp[7][3]来说：
+        1. dp[6][3]求出来后，当新增一层时，第一次扔的位置不会比dp[6][3]的第一个棋子扔的位置更靠下；
+        2. dp[7][4]求出来后，dp[7][3]第一次扔的位置，不会比dp[7][4]扔的更靠上。
+        3. 假设choose[i][j]代表在计算dp[i][j]时，最优解情况下，第一个棋子从哪层楼开始扔的。则枚举第一个棋子扔的位置在choose[i-1][j]，到choose[i][j+1]之间
+    */
+
+   //四边形不等式，复杂度O(n*k)
+    int superEggDrop(int k, int n) {
+        if(n==0) {
+            return 0;
+        }
+        if (k==1) {
+            return n;
+        }
+
+        //dp[i][j]代表还剩i层楼，还有j颗棋子，需要最少试几次。
+        vector<vector<int>> dp(n+1, vector<int>(k+1, 0));
+        //第0行，0层楼，需要试0次
+
+        // choose[i][j]代表在计算dp[i][j]时，最优解情况下，第一个棋子从哪层楼开始扔的
+        vector<vector<int>> choose(n + 1, vector<int>(k + 1, 0));
+
+        //一个棋子，第一列
+        for (int i=1;i<=n;i++) {
+            dp[i][1] = i;
+            choose[i][1] = 1;//只有一个棋子，只能从第一层开始试
+        }
+        //只有一层楼，只需要一次
+        for (int j=1;j<=k;j++) {
+            dp[1][j] = 1;
+            choose[1][j] = 1;
+        }
+
+        //依赖上方格子和左方格子，所以从上到下，从左到右枚举
+        for (int i=2;i<=n;i++) {
+            for (int j=k;j>=2;j--) {
+                int ans = INT_MAX;
+                int first = 0;
+                int down = max(choose[i-1][j], 1);
+                int up = j==k ? i : choose[i][j+1];
+                // cout << "i:" << i << ", j:" << j << " :" << down <<","<< up<< endl;
+                for (int kk=down;kk<=up;kk++) { //最低从第一层，最高到第i层
+                    // cout << "i:" << i << ", j:" << j << ", kk:" << kk << " :" << dp[i-1][j-1] <<","<< dp[i-kk][j]<< endl;
+                    int tmp = max(dp[kk-1][j-1], dp[i-kk][j]);
+                    if (tmp < ans) {
+                        ans = tmp;
+                        first = kk;
+                    }
+                }
+                dp[i][j] = ans+1;
+                choose[i][j] = first;
+            }
+        }
+
+        // cout << "sibianxing_dp:" << endl;
+        // for (int i=0;i<=n;i++) {
+        //     for (int j=0;j<=k;j++) {
+        //         cout << dp[i][j] << " ";
+        //     }
+        //     cout << endl;
+        // }
+        // cout<< endl;
+
+        // cout << "sibianxing_choose:" << endl;
+        // for (int i=0;i<=n;i++) {
         //     for (int j=0;j<=k;j++) {
         //         cout << choose[i][j] << " ";
         //     }
         //     cout << endl;
         // }
-        // cout << endl;
-        return dp[len-1][k];
-    }
-    //二分法解，最优解，复杂度O(N*log(sum))
-    int splitArray(vector<int>& nums, int k) {
-        int len = nums.size();
-        if (len == 0) {
-            return 0;
-        }
-
-        ll sum = 0;
-        int max_num = 0;
-        for (int i=0;i<len;i++) {
-            sum+=nums[i];
-        }
-
-        ll l = 0, r = sum;
-        ll t = 0;
-        ll ans = INT_MAX;
-        cout << "sum:" << sum << endl;
-        while (l <= r) {
-            t = l + ((r-l) >> 1);
-            // cout << "l:" << l << " r:" << r << " t:" << t << " ans:" << ans<< endl;
-            //看能分成多少组
-            int parts=0;
-            int cur_sum =0;
-            bool flag = false;
-            for (int i=0;i<len;i++) {
-                if (nums[i] > t) { //单独的一个数 已经超过了目标
-                    flag = true;
-                    parts = INT_MAX;
-                }
-            }
-            if (!flag) {
-                for (int i=0;i<len;i++) {
-                    if (cur_sum + nums[i] > t) {
-                        parts++;
-                        cur_sum = nums[i];
-                    } else {
-                        cur_sum += nums[i];
-                    }
-                }
-                //最后一部分单独处理
-                if (cur_sum<=t) {
-                    parts++;
-                }
-            }
-            // cout << "parts:" << parts << " k:" << k<< endl;
-            //当前目标可以
-            if (parts <= k) {
-                ans = min(ans, t);//理论上这里其实不用求min，因为t不断逼近最优目标，当求出来一个可以达到的目标后，后面的t会越来越小
-                r = t-1;
-            } else {
-                l = t+1;
-            }
-        }
-
-        return (int)ans;
+        // cout<< endl;
+        return dp[n][k];
     }
 };
 
@@ -211,16 +256,26 @@ int main() {
     Solution sol;
 
     /*
-    输入：nums = [7,2,5,10,8], k = 2
-    输出：18
-    解释：
-    一共有四种方法将 nums 分割为 2 个子数组。 
-    其中最好的方式是将其分为 [7,2,5] 和 [10,8] 。
-    因为此时这两个子数组各自的和的最大值为18，在所有情况中最小。
 
+    输入：k = 1, n = 2
+    输出：2
+    解释：
+    鸡蛋从 1 楼掉落。如果它碎了，肯定能得出 f = 0 。
+    否则，鸡蛋从 2 楼掉落。如果它碎了，肯定能得出 f = 1 。
+    如果它没碎，那么肯定能得出 f = 2 。
+    因此，在最坏的情况下我们需要移动 2 次以确定 f 是多少。
+    示例 2：
+
+    输入：k = 2, n = 6
+    输出：3
+    示例 3：
+
+    输入：k = 3, n = 14
+    输出：4
     */
-    vector<int> arr = {0};
-    int k = 1;
-    cout << sol.splitArray_sibianxing(arr, k) << endl;
-    cout << sol.splitArray(arr, k) << endl;
+    int k = 5;
+    int n = 200;
+    // cout << sol.superEggDrop_baoli(k, n) << endl;
+    cout << sol.superEggDrop_dp(k, n) << endl;
+    cout << sol.superEggDrop(k, n) << endl;
 }
