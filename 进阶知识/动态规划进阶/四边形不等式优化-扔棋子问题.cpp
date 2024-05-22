@@ -177,11 +177,14 @@ public:
         3. 区间划分问题
         4. 不同时依赖本行和本列的值：依赖本行，但不依赖本列
 
-    因为枚举的是第一个棋子扔的位置，对于dp[7][3]来说，dp[6][3]求出来后，当新增一层时，第一次扔的位置不会比dp[6][3]的第一个棋子扔的位置更靠下；dp[7][4]求出来后，dp[7][3]第一次扔的位置，不会比dp[7][4]扔的更靠上。
+    因为枚举的是第一个棋子扔的位置，对于dp[7][3]来说：
+        1. dp[6][3]求出来后，当新增一层时，第一次扔的位置不会比dp[6][3]的第一个棋子扔的位置更靠下；
+        2. dp[7][4]求出来后，dp[7][3]第一次扔的位置，不会比dp[7][4]扔的更靠上。
+        3. 假设choose[i][j]代表在计算dp[i][j]时，最优解情况下，第一个棋子从哪层楼开始扔的。则枚举第一个棋子扔的位置在choose[i-1][j]，到choose[i][j+1]之间
     */
 
-   //枚举行为会超时，复杂度O(n^2*k)
-    int superEggDrop_dp(int k, int n) {
+    //四边形不等式，复杂度O(n*k)，当n很大时会超时
+    int superEggDrop_sibianxing(int k, int n) {
         if(n==0) {
             return 0;
         }
@@ -199,20 +202,36 @@ public:
         //一个棋子，第一列
         for (int i=1;i<=n;i++) {
             dp[i][1] = i;
+            choose[i][1] = 1;//只有一个棋子，只能从第一层开始试
         }
+        //只有一层楼，只需要一次
+        for (int j=1;j<=k;j++) {
+            dp[1][j] = 1;
+            choose[1][j] = 1;
+        }
+
         //依赖上方格子和左方格子，所以从上到下，从左到右枚举
-        for (int i=1;i<=n;i++) {
-            for (int j=2;j<=k;j++) {
+        for (int i=2;i<=n;i++) {
+            for (int j=k;j>=2;j--) {
                 int ans = INT_MAX;
-                for (int kk=1;kk<=i;kk++) {
+                int first = 0;
+                int down = max(choose[i-1][j], 1);
+                int up = j==k ? i : choose[i][j+1];
+                // cout << "i:" << i << ", j:" << j << " :" << down <<","<< up<< endl;
+                for (int kk=down;kk<=up;kk++) { //最低从第一层，最高到第i层
                     // cout << "i:" << i << ", j:" << j << ", kk:" << kk << " :" << dp[i-1][j-1] <<","<< dp[i-kk][j]<< endl;
-                    ans = min(ans, max(dp[kk-1][j-1], dp[i-kk][j]));
+                    int tmp = max(dp[kk-1][j-1], dp[i-kk][j]);
+                    if (tmp <= ans) { //第一次扔的位置越高越好，更新first
+                        ans = tmp;
+                        first = kk;
+                    }
                 }
                 dp[i][j] = ans+1;
+                choose[i][j] = first;
             }
         }
 
-        // cout << "dp:" << endl;
+        // cout << "sibianxing_dp:" << endl;
         // for (int i=0;i<=n;i++) {
         //     for (int j=0;j<=k;j++) {
         //         cout << dp[i][j] << " ";
@@ -220,7 +239,72 @@ public:
         //     cout << endl;
         // }
         // cout<< endl;
+
+        // cout << "sibianxing_choose:" << endl;
+        // for (int i=0;i<=n;i++) {
+        //     for (int j=0;j<=k;j++) {
+        //         cout << choose[i][j] << " ";
+        //     }
+        //     cout << endl;
+        // }
+        // cout<< endl;
         return dp[n][k];
+    }
+
+
+    /*
+    从另外的角度想，当楼层n很大时，以楼层做行复杂度会很大。
+    假设dp[i][j]代表i颗棋子，可以尝试j次，最多可以搞定多少层楼。
+    对于dp[3][10]，有3颗棋子，可以扔10次，假设已经求出来了dp[2][9]=15, dp[3][9]=20：
+        1. 最优的时候，需要在16层扔一次，假设碎了,还剩2个棋子。根据dp[2][9]的值可以知道，2个棋子尝试9次是可以搞定下面的15层的。
+        2. 在16层扔一次，没有碎，还剩3个棋子。根据dp[3][9]的值可以知道，3个棋子尝试9次是可以搞定上面的20层的。
+        3. 所以dp[3][10]最多搞定的楼层是15+1+20=36
+    抽象来看dp[i][j], 无论怎么扔棋子，只有碎和没碎两种情况，在某个最优层扔时：
+        1. 碎了，还剩i-1个棋子，j-1次机会。向下能搞定的楼层是dp[i-1][j-1]
+        2. 没碎，还有i个棋子，j-1次机会。向上能搞定的楼层是dp[i][j-1]
+        3. 最优的位置是由dp[i-1][j-1]决定的
+    
+    假设最多扔s次，答案是dp[k][s]，当k等于1时，s退化成n
+    第0行，0个棋子，搞定0层楼
+    第0列，0次机会，搞定0层楼
+    第1行，1个棋子，搞定i层楼
+    第1列，1次机会，无论多少个棋子都只能搞定1层楼
+    总复杂度是O(k*s),  当k为1时，s为n
+
+    所以dp[i][j]只依赖左边和左上角位置，从上到下，从左到右填。
+    可以状态压缩，使用一个数组循环滚动，注意这里因为要使用到左边的值，所以是按列滚动。第一次出现超过n的数时的尝试次数就是答案。
+    */
+    int superEggDrop(int k, int n) {
+        if(n==0) {
+            return 0;
+        }
+        if (k==1) {
+            return n;
+        }
+        //1层楼，且棋子数不是1
+        if (n==1) {
+            return 1;
+        }
+
+        //初始在第一列，尝试1次只能搞定一个楼层
+        vector<int> dp(k+1, 0);
+        for (int i=1;i<=k;i++) {
+            dp[i] = 1;
+        }
+
+        //尝试次数最大是n
+        for (int j=2;j<=n;j++) {
+            for (int i=k;i>=2;i--) {
+                dp[i] = dp[i] + dp[i-1]+1; //左边和左上角
+                if (dp[i] >= n) {
+                    return j;
+                }
+            }
+            dp[1] = j; //只有一个棋子时，尝试多少次，就能搞定多少层楼
+        }
+
+        //一直没有找到答案，就是最大值n
+        return n;
     }
 };
 
@@ -245,8 +329,10 @@ int main() {
     输入：k = 3, n = 14
     输出：4
     */
-    int k = 3;
-    int n = 14;
-    cout << sol.superEggDrop_baoli(k, n) << endl;
+    int k = 5;
+    int n = 200;
+    // cout << sol.superEggDrop_baoli(k, n) << endl;
+    cout << sol.superEggDrop_dp(k, n) << endl;
+    cout << sol.superEggDrop_sibianxing(k, n) << endl;
     cout << sol.superEggDrop(k, n) << endl;
 }
