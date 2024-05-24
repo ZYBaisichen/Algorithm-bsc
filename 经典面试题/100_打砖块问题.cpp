@@ -1,7 +1,7 @@
 /*
  * @Author: baisichen
  * @Date: 2024-02-26 15:02:38
- * @LastEditTime: 2024-05-22 21:07:57
+ * @LastEditTime: 2024-05-24 13:19:46
  * @LastEditors: baisichen
  * @Description: 
  */
@@ -87,27 +87,297 @@ hits[i].length == 2
 
 /*
 
+大流程：
+    1. 将所有需要消除的位置从1变成2，代表将要被炮弹影响。修改过的矩阵是g
+    2. 将g中所有的1，建立并查集集合，并标记各个集合是否是链接到天花板上的
+    3. 按照消除顺序的逆序遍历消除位置，将其从2变成1，每次变成1时。合并各个集合，新增能挂在天花板上不掉落的砖块数量，就是消除这一砖块时掉落的砖块数量，记录在答案里
 
 
 */
+void print_grid(vector<vector<int>>& grid, string suf = "grid:") {
+    cout << suf << endl;
+    int n = grid.size();
+    if (n==0) {
+        return;
+    }
+    int m = grid[0].size();
+    for (int i=0;i<n;i++) {
+        for (int j=0;j<m;j++) {
+            cout << grid[i][j] << " ";
+        }
+        cout << endl;
+    }
+    cout << endl;
+}
+
+
+class UnionFind{
+public:
+    int* _parents; //记录每个节点的父节点
+    int* _sizes; //记录当前节点的所代表集合的节点数量
+    bool* is_celling; //是否是链接天花板的
+    int celling_num; //链接天花板节点数量
+    vector<vector<int>>&  _grid;
+    int _n,_m;
+
+    UnionFind(vector<vector<int>>& grid): _grid(grid) {
+        init_space();
+        init_connect();
+    }
+    void init_space() {
+        int _n = _grid.size();
+        int _m = _grid[0].size();
+        // cout << "_n:" << _n << " _m:" << _m <<   endl;
+        int n = _grid.size();
+        int m = _grid[0].size();
+        int all_num = n*m;
+        
+        _parents = new int[all_num];
+        _sizes = new int[all_num];
+        is_celling = new bool[all_num];
+        celling_num = 0;
+
+        for (int i=0;i<all_num;i++) {
+            _parents[i] = -1;
+            _sizes[i] = 0;
+            is_celling[i] = false;
+        }
+
+        //将1的各个集合建立节点
+        for (int i=0;i<n;i++) {
+            for (int j=0;j<m;j++) {
+                if (_grid[i][j] == 1) {
+                    int idx = i*m+j;
+                    _parents[idx] = idx;
+                    _sizes[idx] = 1;
+                    if (i==0) {
+                        is_celling[idx] = true;
+                        celling_num++;
+                    }
+                }
+            }
+        }
+
+        // cout << "_parents:" << endl;
+        // for (int i=0;i<all_num;i++) {
+        //     cout << _parents[i] << " ";
+        // }
+        // cout << endl;
+    }
+
+    //初始化集合
+    void init_connect() {
+        int n = _grid.size();
+        int m = _grid[0].size();
+        int all_num = n*m;
+        for (int i=0;i<n;i++) {
+            for (int j=0;j<m;j++) {   
+                unionSet(i, j, i+1, j);
+                unionSet(i, j, i-1, j);
+                unionSet(i, j, i, j+1);
+                unionSet(i, j, i, j-1);
+            }
+        }
+    }
+
+    ~UnionFind() {
+        if (_parents) {
+            delete[] _parents;
+        }
+        if (_sizes) {
+            delete[] _sizes;
+        }
+        if (is_celling) {
+            delete[] is_celling;
+        }
+    }
+    
+    bool isSameSet(int x1, int y1, int x2, int y2) {
+        int n = _grid.size();
+        int m = _grid[0].size();
+        int idx_a = x1 * m + y1;
+        int idx_b = x2 * m + y2;
+        int a_p = find_parent(idx_a);
+        int b_p = find_parent(idx_b);
+        // if (a==2&&b==3) {
+        //     cout << "isSameSet:" <<  a_p << "," << b_p << endl;
+        // }
+        return a_p == b_p;
+    }
+
+    bool is_valid(int i,int j) {
+        int n = _grid.size();
+        int m = _grid[0].size();
+        if (i<0||j<0||i>=n||j>=m) {
+            return false;
+        }
+        if (_grid[i][j] != 1) {
+            return false;
+        }
+        return true;
+    }
+
+    void unionSet(int x1, int y1, int x2, int y2) {
+        //有一个下标无效，则不需要合并
+        if (!is_valid(x1, y1) || !is_valid(x2, y2)) {
+            return;
+        }
+        int n = _grid.size();
+        int m = _grid[0].size();
+        int idx_a = x1 * m + y1;
+        int idx_b = x2 * m + y2;
+
+        int a_p = find_parent(idx_a);
+        int b_p = find_parent(idx_b);
+        // cout << "x1:" << x1 << " y1:" << y1 << " x2:" << x2 << " y2:" << y2
+        //      << " grid[x1][y1]:" << _grid[x1][y1] << " grid[x2][y2]:" << _grid[x2][y2]
+        //      << " a_p:" << a_p << " b_p:" << b_p
+        //      << " a_p_is_celling:" << is_celling[a_p] << " b_p_is_celling:" << is_celling[b_p]
+        //      << " a_p_size:" << _sizes[a_p] << " _sizes[b_p]:" << _sizes[b_p]
+        //      << " celling_num:" << celling_num << endl;
+        if (a_p == -1 || b_p==-1) { //有一个是无效的，则不需要合并
+            return;
+        }
+        //不在一个集合
+        if (a_p != b_p) {
+            bool status1 = is_celling[a_p];
+            bool status2 = is_celling[b_p];
+            int size1 = _sizes[a_p];
+            int size2 = _sizes[b_p];
+
+            int _big_p = _sizes[a_p] >= _sizes[b_p] ? a_p : b_p;
+            int _little_p = _sizes[a_p] >= _sizes[b_p] ? b_p : a_p;
+            _parents[_little_p] = _big_p; //小挂大
+            _sizes[_big_p] = _sizes[_big_p] + _sizes[_little_p]; //大的更新size
+
+            // _sizes[_little_p] = -1;
+            //两个集合是否挂在天花板上的状态不一样时：有一个在天花板上
+            if (status1 ^ status2) {
+                is_celling[_big_p] = true;
+                // cout << "celling_num11111:" << celling_num << " size1:" << size1 << " szie2:" << size2 << endl;
+                celling_num += status1 ? size2 : size1;//加上本来不在天花板上1的数量
+                // cout << "celling_num22222:" << celling_num << " size1:" << size1 << " szie2:" << size2 << endl;
+            }
+
+        }
+    }
+
+    int find_parent(int cur) {
+        int res = cur;
+        while(res!=-1 && _parents[res] != res) {
+            res = _parents[res];
+        }
+        //扁平化
+        int tmp = cur;
+        while (res!=-1 && _parents[tmp] != res) {
+            tmp = _parents[tmp];
+            _parents[tmp] = res;
+            // cout << "res:"  << res << " tmp:" << tmp << endl;
+        }
+        return res;
+    }
+    // map<V, Node<V>> nodes;
+
+    //将对应消除的位置变为1，计算返回之前掉落的砖块数量
+    int finger(int i,int j) {
+        int n = _grid.size();
+        int m = _grid[0].size();
+        if (_grid[i][j] != 2) {
+            return 0;
+        }
+        //将i,j位置的2变为1
+        _grid[i][j] = 1;
+        int idx = i*m+j;
+        _parents[idx] = idx;
+        _sizes[idx] = 1;
+        if(i==0) {
+            is_celling[idx] = true;
+            celling_num++;
+        }
+        int pre = celling_num;
+        // cout << "celling_num1: " << celling_num << endl;
+        unionSet(i, j, i - 1, j);
+        // cout << "celling_num2: " << celling_num << endl;
+        unionSet(i, j, i+1, j);
+        // cout << "celling_num3: "<< celling_num << endl;
+        unionSet(i, j, i, j-1);
+        // cout << "celling_num4: " << celling_num << endl;
+        unionSet(i, j, i, j+1);
+        // cout << "celling_num5: "<< celling_num << endl;
+        int cur = celling_num;
+        if (i==0) {
+            return cur-pre;
+        } else {
+            return cur == pre ? 0 : cur-pre-1;
+        }
+    }
+};
+
 
 
 class Solution {
 public:
     vector<int> hitBricks(vector<vector<int>>& grid, vector<vector<int>>& hits) {
+        vector<int> res;
+        int n = grid.size();
+        if (n==0) {
+            return res;
+        }
+        int m = grid[0].size();
+        if (m==0) {
+            return res;
+        }
 
+        int len = hits.size();
+        
+        //将消除的地方都标记成2
+        for (int i=0;i<len;i++) {
+            int x= hits[i][0];
+            int y= hits[i][1];
+            if (grid[x][y] == 1) {
+                grid[x][y] = 2;
+            }
+        }
+        print_grid(grid);
+
+        UnionFind uf(grid);
+        // cout << "0,0,0:" << uf.isSameSet(0,0,0,0) << endl;
+        // cout << "1,1,2:" << uf.isSameSet(1, 1, 1, 2) << endl;
+
+        res.resize(len,0);
+        for (int i=len-1;i>=0;i--) {
+            res[i] = uf.finger(hits[i][0], hits[i][1]);
+        }
+        return res;
     }
 };
 
 int main() {
     Solution sol;
-    vector<vector<int>> m = {
-        {3,3,3,2},
-        {3,2,3,3},
-        {3,3,3,2},
-        {2,3,2,3},
-    };
-    //{1,1,3,2,3,0,0,0,0,0}
-    cout << sol.get_min_sum(m) << endl;
+    // vector<vector<int>> grid = {
+    //     {1, 0, 0, 0},
+    //     {1, 1, 1, 0},
+    // };
+    // vector<vector<int>> hits = {
+    //     {1, 0},
+    // };
+vector<vector<int>> grid = {
+    {1,1,1},
+    {0,1,0},
+    {0,0,0}};
+vector<vector<int>> hits ={
+    {0,2},
+    {2,0},
+    {0,1},
+    {1,2}};
+
+//     grid = [[1,0,0,0],[1,1,1,0]], hits = [[1,0]]
+// 输出：[2]
+    vector<int> res = sol.hitBricks(grid, hits);
+    cout << "res:" << endl;
+    for (auto &x: res) {
+        cout << x << " ";
+    }
+    cout << endl;
     return 0;
 }
