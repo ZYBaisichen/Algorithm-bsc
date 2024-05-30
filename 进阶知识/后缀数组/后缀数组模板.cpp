@@ -26,116 +26,74 @@
 using namespace std;
 
 /*
+论文地址：https://www.cs.cmu.edu/~guyb/paralg/papers/KarkkainenSanders03.pdf
+dc3模板代码来自《Simple Linear Work Suffix Array Construction》论文
 
- https://leetcode.com/problems/create-maximum-number/
-给你两个整数数组 nums1 和 nums2，它们的长度分别为 m 和 n。数组 nums1 和 nums2 分别代表两个数各位上的数字。同时你也会得到一个整数 k。
-
-请你利用这两个数组中的数字中创建一个长度为 k <= m + n 的最大数，在这个必须保留来自同一数组的数字的相对顺序。
-
-返回代表答案的长度为 k 的数组。
-
- 
-
-示例 1：
-
-输入：nums1 = [3,4,6,5], nums2 = [9,1,2,5,8,3], k = 5
-输出：[9,8,6,5,3]
-示例 2：
-
-输入：nums1 = [6,7], nums2 = [6,0,4], k = 5
-输出：[6,7,6,0,4]
-示例 3：
-
-输入：nums1 = [3,9], nums2 = [8,9], k = 3
-输出：[9,8,9]
- 
-
-提示：
-
-m == nums1.length
-n == nums2.length
-1 <= m, n <= 500
-0 <= nums1[i], nums2[i] <= 9
-1 <= k <= m + n
-
+笔记地址位置：
+@(数据结构与算法)
+# 左神-进阶-后缀数组
 */
+
+
+inline bool leq(int a1, int a2, int b1, int b2) { //字典序比较， 两个的情况
+    return (a1<b1 || a1 == b1 && a2 <= b2);
+}
+
+//比较三个数字对的大小
+//(a1,a2,a3)<=(b1,b2,b3)时，返回true
+inline bool leq(int a1, int a2, int a3, int b1, int b2, int b3){ // 3个的情况
+    return (a1<b1 || a1==b1 && (leq(a2,a3, b2,b3)));
+}
 
 /*
-方法一：单调数组方法：
-在num1中拿i个数字， 在nums2中拿k-i个数字。
-在nums中拿i个数字，使用一个单调栈，遍历一遍，在单调栈中从底到顶是递减的序列，最后保证栈中保留i个数字就可以
-每次这样找到数组复杂度是O(m+n)
-
-两个数组挑选出来后，做merge
-nums1_i和nums2_k_i，双指针i和j分别指向两个数组的开始。然后每次到达一个新的位置时，从i和j开始向后比较，直到分出胜负，将字典序大的放在前面。向后移动。
-最坏的情况是[9,9,9,9]和[9,9,9]，每次都需要遍历到数组结尾才能知道谁的字典序比较大，每次i和j到达新的位置，最坏遍历m+n次。复杂度O((N+M)^2)
-
-枚举k次求结果，总复杂度O(k*(m+n+(n+m)^2))， 简化是O(k*(m+n)^2), k最大取到m+n，所以是O((m+n)^3)
-
-
-方法二：dp+merge加速
-首先第一个方法不再使用单调栈，而是先准备一个dp， dp[i][j]表示[i...]范围上，拿出j个数，最大数列的开头位置
-   1. dp[i][len-i]，表示从i开始，往后取len-i个数，只有一种取法(因为i往后就只有len-i个数了), 就是i往后所有，开头位置是i
-   2. dp[i][j]， st. j<len-i， 有两种情况，必须取i，依赖dp[i+1][j-1](i+1上取j-1个数)；必须不取i，依赖dp[i+1][j](i+1往后取j个数)
-        取两个可能背后的arr对应元素，最大的；当相等时，取前面的，因为开头位置选的靠前可以有笔后面更多的可能性，方便后面取最大的。
-每次在nums数组中取i个数组最大的数时，可以使用dp方便拿到。
-比如要在arr中拿3个数，即从0开始往后范围，拿3个数：
-    首先找到第一个数的位置dp[0][3]=2， 将arr[2]作为第一个数
-    接下来需要在3...n范围上拿剩余的2个数，找到dp[3][2]=4， 则将arr[4]作为第二个数
-    接下来在4...n范围上拿剩余的1个数，找到dp[4][1]=8, 则将arr[8]作为第三个数。
-    可以在O(K)复杂度拿到，但dp数组是O(n*k)和O(m*k)的。
-
-    同样使用方法一中的merge O((n+m)^2)
-
-    总复杂度是O(m*k)+O(n*k)+O(k*(k+(n+m)^2)) 化简保留高阶是O(k*(n+m)^2)，k最大是m+n，复杂度还是O((m+n)^3)
-
-
-方法三：后缀数组方法优化merge
-第一步从nums中拿i个数的最大数列，还是使用方法二中的dp方法，复杂度O(k)，dp生成O(n*k)+O(m*k)
-第二步，将两个数列拼接到一起，中间使用0隔断，得到后缀数组。比如:
-    [3339] 下标为[0,1,2,3]
-    [331] 下标为[0',1',2']
-    排名一样，则右边的靠前，因为更短
-    [33390331]的后缀数组是
-    [45670321]
-    排名越大越在前面，所以整体排名是：[3339331] 对应到原数组是[0,1,2,3,0',1',2']
-
-    生成后缀数组DC3是O(N), merge时每次可以在O(1)时间知道以i和j开头时的后缀数组排名，排名越大越排在前面，有O(n+m)复杂度。
-    外层枚举k次，所以整体复杂度是O(n*k)+O(m*k)+O(k*(k + (n+m) + (m+n)*1)) = O(n*k+m*k+k^2+2*k*m+2*k*n)=O(3k*(m+n)+k^2)
-    k最多取到M+N， 所以复杂度可以到达O((m+n)^2)
-
+原文注释:stably sort a[0..n-1] to b[0..n-1] with keys in 0..K from r
+从a到b的稳定基数排序，a中的每个元素大小是0...K范围的，获取到的后缀数组放在b中
 */
-class Solution {
-public:
-    int longestRepeatingSubstring(string s) {
-        int len = s.length();
-        if (len == 0) {
-            return 0;
+static void radixPass(int* a, int* b, int* r, int n, int K) {
+    
+}
+
+/*
+原文注释：
+//find the suffix array SA of s[0..n-1] in {1..K}ˆn
+// require s[n]=s[n+1]=s[n+2]=0, n>=2
+
+构造数组s的后缀数组SA，s中元素的大小范围是{1...K}， 要去n大于2个数，并且，在s数组的后面跟两个0，用于求解s12时构造(s[n],s[n+1],s[n+2])，然后面跟着的字典序尽可能的小
+*/
+void suffixArray(int* s, int* SA, int n, int k) {
+    int n0 = (n+2)/3; //假设有7个数，0,1,2,3,4,5,6 共(7+2)/3个s0类下标，是3元组的第一个，为了让最后一个3元祖的第一个数出来，需要加2补齐成3元组
+    int n1 = (n+1)/3; //假设有8个数，0,1,2,3,4,5,6,7，共(8+1)/3=3个s1类下标，是3元祖的第二个，为了让最后一个3元祖的第二个数出来，需要加1补齐成3元组
+    int n2 = n/3; //因为是三元组中的第3个数，所以直接除3
+    int n02 = n0+n2; //因为n0>=n1，所以下面的s12的长度以n0+n2的长度为基准
+    //s12的长度是n1+n2 = (2n+1)/3 = 2n/3 + 1/3
+    //n0+n2 = (2n+3)/3 = 2n/3 + 1
+    //n1+n2的向上取整就是n0+n2
+
+    int * s12 = new int[n02+3];//后面需要补两个0
+    s12[n02] = s12[n02+1] = s12[n02+2] = 0;
+
+    int* SA12 = new int[n02+3];
+    SA12[n02] = SA12[n02+1] = SA12[n02+2] = 0;
+    int* s0 = new int[n0];
+    int* SA0 = new int[n0];
+
+    /*
+    // generate positions of mod 1 and mod 2 suffixes
+    // the "+(n0-n1)" adds a dummy mod 1 suffix if n%3 == 1 //没懂这为啥要加个(n0-n1=1/3)?
+    如果n%3==1，此时最后一个下标是s0下标。比如n=7时，n0=3,n1=2,n2=2 n+(n0-n1)=7+(3-2)=8， s1和s2一共4个数
+    生成s12的位置数组，s12[j]=i代表s12数组的j位置对应的是i开头的后缀串
+    */
+    for (int i=0;j=0;i<n+(n0-n1);i++) {
+        if (i % 3 != 0) {
+            s12[j++] = i;
         }
-        vector<vector<int>> dp(len, vector<int>(len, 0));
-        int ans = 0; //至少是1
-        //第一行
-        for (int j=1;j<len;j++) {
-            dp[0][j] = s[0]==s[j]?1:0;
-        }
-        for (int i=1;i<len;i++) {
-            for (int j=i+1;j<len;j++) {
-                if (i!=j && s[i] == s[j]) {
-                    dp[i][j] = dp[i-1][j-1]+1;
-                    ans = max(ans, dp[i][j]);
-                }
-            }
-        }
-        // for (int i=0;i<len;i++) {
-        //     for (int j=0;j<len;j++) {
-        //         cout << dp[i][j] << " ";
-        //     }
-        //     cout << endl;
-        // }
-        // cout << endl;
-        return ans;
     }
-};
+
+    
+
+
+}
+
 
 int main() {
     Solution sol;

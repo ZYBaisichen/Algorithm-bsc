@@ -135,6 +135,8 @@ public class Code02_CreateMaximumNumber {
 			return skew(arr, n, max);
 		}
 
+        //这里的K是基数排序桶编号最大的值
+        //下面的代码其实就是源自论文中的c代码
 		private int[] skew(int[] nums, int n, int K) {
 			int n0 = (n + 2) / 3, n1 = (n + 1) / 3, n2 = n / 3, n02 = n0 + n2;
 			int[] s12 = new int[n02 + 3], sa12 = new int[n02 + 3];
