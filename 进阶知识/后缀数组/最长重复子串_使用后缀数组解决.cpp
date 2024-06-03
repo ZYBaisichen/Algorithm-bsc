@@ -1,7 +1,11 @@
 /*
  * @Author: baisichen
  * @Date: 2024-02-26 15:02:38
+<<<<<<< HEAD
  * @LastEditTime: 2024-06-03 13:43:10
+=======
+ * @LastEditTime: 2024-06-03 14:21:38
+>>>>>>> 后缀数组2
  * @LastEditors: baisichen
  * @Description: 
  */
@@ -276,11 +280,38 @@ public:
         }
         return ans;
     }
+
+    //1044
+    string longestDupSubstring(string s) {
+        int len = s.length();
+        if (len == 0) {
+            return 0;
+        }
+        vector<int> nums(len, 0);
+        for (int i=0;i<len;i++) {
+            nums[i] = s[i] - 'a' + 1;
+        }
+        DC3 dc3(nums, 256);
+        // print_arr(nums, "nums:");
+        // print_arr(dc3.sa, "sa:");
+        // print_arr(dc3.rank, "rank:");
+        // print_arr(dc3.height, "height:");
+        int max_len = 0;
+        string ans = "";
+        
+        for (int i=0;i<len;i++) {
+            if (dc3.height[dc3.rank[i]] > max_len) {
+                max_len = dc3.height[dc3.rank[i]];
+                ans = s.substr(i, max_len);
+            }
+        }
+        return ans;
+    }
 };
 
 int main() {
     Solution sol;
-    string s = "aaaaa";
+    string s = "banana";
     /*
     字符串：aaaaa
 
@@ -293,7 +324,8 @@ int main() {
     rank [4,3,2,1,0]
     height [0,1,2,3,4]
     */
-    cout << sol.longestRepeatingSubstring(s) << endl;
+   cout << sol.longestRepeatingSubstring(s) << endl;
+    cout << sol.longestDupSubstring(s) << endl;
 
     return 0;
 }
