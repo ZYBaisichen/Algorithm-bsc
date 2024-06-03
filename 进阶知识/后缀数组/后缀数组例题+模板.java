@@ -3,51 +3,9 @@ package class45;
 // 测试链接: https://leetcode.com/problems/create-maximum-number/
 public class Code02_CreateMaximumNumber {
 
-	public static int[] maxNumber1(int[] nums1, int[] nums2, int k) {
-		int len1 = nums1.length;
-		int len2 = nums2.length;
-		if (k < 0 || k > len1 + len2) {
-			return null;
-		}
-		int[] res = new int[k];
-		int[][] dp1 = getdp(nums1); // 生成dp1这个表，以后从nums1中，只要固定拿N个数，
-		int[][] dp2 = getdp(nums2);
-		// get1 从arr1里拿的数量
-		// K - get1 从arr2里拿的数量
-		for (int get1 = Math.max(0, k - len2); get1 <= Math.min(k, len1); get1++) {
-			// arr1 挑 get1个，怎么得到一个最优结果
-			int[] pick1 = maxPick(nums1, dp1, get1);
-			int[] pick2 = maxPick(nums2, dp2, k - get1);
-			int[] merge = merge(pick1, pick2);
-			res = preMoreThanLast(res, 0, merge, 0) ? res : merge;
-		}
-		return res;
-	}
 
-	public static int[] merge(int[] nums1, int[] nums2) {
-		int k = nums1.length + nums2.length;
-		int[] ans = new int[k];
-		/*
-		之所以要这么merge，是因为要让大的数更快的出现，比如
-		[3,3,3,9]
-		[3,3,3,2]
-		合并到一起时变成[3,3,3,9,3,3,3,2]，指向上面数组的指针，需要快速的往后指到9
-		 */
-		for (int i = 0, j = 0, r = 0; r < k; ++r) {
-			ans[r] = preMoreThanLast(nums1, i, nums2, j) ? nums1[i++] : nums2[j++];
-		}
-		return ans;
-	}
 
-	public static boolean preMoreThanLast(int[] nums1, int i, int[] nums2, int j) {
-		while (i < nums1.length && j < nums2.length && nums1[i] == nums2[j]) {
-			i++;
-			j++;
-		}
-		return j == nums2.length || (i < nums1.length && nums1[i] > nums2[j]);
-	}
-
-	public static int[] maxNumber2(int[] nums1, int[] nums2, int k) {
+	public static int[] maxNumber(int[] nums1, int[] nums2, int k) {
 		int len1 = nums1.length;
 		int len2 = nums2.length;
 		if (k < 0 || k > len1 + len2) {

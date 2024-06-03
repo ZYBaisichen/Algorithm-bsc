@@ -27,7 +27,7 @@ public:
         int len = nums.size();
         // 单调递减的双端队列，存储滑动窗口哪些数最大的优先级
         int* deque = new int[MAXN];
-        int h = 0, t = 0;
+        int h = 0, t = 0;//head和tail
         for (int i = 0; i < k - 1; i++)
         {
             // 依次弹出，直到找到一个比arr[i]大的数
