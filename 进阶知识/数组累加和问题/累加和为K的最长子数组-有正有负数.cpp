@@ -40,7 +40,7 @@ public:
         tmp[0] = -1;
         int len = arr.size();
         int sum = 0;
-        int res = 0;
+        int res = 0; //记录满足条件的数组最大长度
         for (int i = 0; i < len; i++)
         {
             sum += arr[i];
