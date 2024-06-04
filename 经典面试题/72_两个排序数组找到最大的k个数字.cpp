@@ -158,8 +158,8 @@ public:
                 return longs[k-s-1];
            }
             //同样元素的数组获取大小
-            // s-1-(k-l-1) = s+l-k = l-1-(k-s-1)
-            return get_up_median(shorts, k-l-1, s-1, longs, k-s-1, l-1);
+            // s-1-(k-l-1+1) = s+l-k-1 = l-1-(k-s-1+1)
+            return get_up_median(shorts, k-l-1+1, s-1, longs, k-s-1+1, l-1);
         } else { //s<k<=l
 
             /*
@@ -171,7 +171,7 @@ public:
            if (longs[k-s-1]>=shorts[s-1]) { //s+(k-s)=k
                return longs[k-s-1];
            }
-           return get_up_median(shorts, 0, s-1, longs, k-s-1, k-1);
+           return get_up_median(shorts, 0, s-1, longs, k-s-1+1, k-1);
         }
     }
 

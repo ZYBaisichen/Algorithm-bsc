@@ -72,6 +72,7 @@ public:
                 else
                 {
                     if (i == 0) {
+                        //跳过重复数字。 nums[l]如果和nums[l-1]一样的话，则它产生的答案都已经在nums[l-1]的时候出现过了。
                         if (l == i+1 || (nums[l - 1] != nums[l])) {
                             vector<int> tmp = {nums[l], nums[r], nums[i]};
                             res.push_back(tmp);

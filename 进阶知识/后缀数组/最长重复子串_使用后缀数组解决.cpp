@@ -1,11 +1,7 @@
 /*
  * @Author: baisichen
  * @Date: 2024-02-26 15:02:38
-<<<<<<< HEAD
- * @LastEditTime: 2024-06-03 13:43:10
-=======
  * @LastEditTime: 2024-06-03 14:21:38
->>>>>>> 后缀数组2
  * @LastEditors: baisichen
  * @Description: 
  */

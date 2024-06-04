@@ -48,7 +48,7 @@ public:
     3. 当max被更新了，说明转了一片湖。
 
 
-    每个点都需要出和入小根堆一次O(N*M)， 假设小根堆最大能达到K(最大N*M), 所以总复杂度是O(N*M*long(k))
+    每个点都需要出和入小根堆一次O(N*M)， 假设小根堆最大能达到K(最大N*M), 所以总复杂度是O(N*M*log(k))
     */
     int trapRainWater(vector<vector<int>>& heightMap) {
         int n = heightMap.size();
@@ -60,7 +60,7 @@ public:
             return 0;
         }
 
-        auto cmp = [](Node* a, Node* b) { return a->num > b->num; }; //按照num组织小顶堆
+        auto cmp = [](Node* a, Node* b) { return a->num > b->num; }; //按照num组织小顶堆. a是堆顶，当小于堆顶时，b放在堆顶
         // auto cmp_big = [](project* a, project* b) { return a->_profit < b->_profit; }; //按照利润组织大顶堆
         priority_queue<Node*, vector<Node*>, decltype(cmp)> min_heap(cmp);
         // priority_queue<project*, vector<project*>, decltype(cmp_big)> max_heap(cmp_big);
