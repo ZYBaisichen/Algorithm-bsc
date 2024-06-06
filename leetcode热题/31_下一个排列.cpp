@@ -1,7 +1,7 @@
 /*
  * @Author: baisichen
  * @Date: 2024-02-26 15:02:38
- * @LastEditTime: 2024-06-04 16:50:08
+ * @LastEditTime: 2024-06-05 11:27:46
  * @LastEditors: baisichen
  * @Description:
  */
@@ -65,23 +65,94 @@ https://leetcode.cn/problems/next-permutation/description/
 
 参考题解：
 https://leetcode.cn/problems/next-permutation/solutions/80560/xia-yi-ge-pai-lie-suan-fa-xiang-jie-si-lu-tui-dao-/
+核心思想是通过数学观察法得到的。
+下一个排列的定义是：给定数字序列的字典序中下一个更大的排列。如果不存在下一个更大的排列，则将数字重新排列成最小的排列，即升序排列 
+将问题形式化的描述为：给定若干数字，将其组合为一个整数。如果讲这些数字重新排列，以得到更大的数，且尽可能的小。
+                 比如123的下一个更大的数是132，如果没有更大的数，则输出最小数。
 
 
+以1,2,3,4,5,6为例，排序依次是：
+123456
+123465
+123546
+123564
+123645
+123654
+...
+654321
 
+算法推导：
+1. 我们希望下一个数比当前数大，这样才能满足“下一个排列”的第一个条件。因此需要将后面的大数与前面的小数交换，可以得到一个较大的数
+2. 我们还希望下一个数，增加的幅度尽可能的小，这样才能满足“与当前排列紧邻”的要求。为满足这个要求：
+    a. 将一个尽可能小的'大数'与前面的'小数'交换。比如123465，下一个排列应该是把5和4交换。而不是把6和4交换
+    b. 将“大数”交换到前面后，需要将"大数"后面的所有数重置为升序，因为高位已经是变的更大了，后面需要尽可能的小，而重置为升序是最小，
+        比如123465将5和4交换后变成123564，然后将5后面的数排序，变成123546，显然123546<123564
+
+算法过程：
+1. 从后向前找到第一个相邻的的升序对, (i,j)，满足a[i]<a[j]，此时[j,end)必定是降序排列的。因为从后往前(i,j)是第一个升序对
+    此时的a[i]就是需要和后面交换顺序的小数。
+2. 在[j,end)从后往前找到第一个大于a[i]的数，因为[j,end)上是降序，第一个大于a[i]的数就是这个序列中，满足大于a[i]条件的最小的数， 假设这个数是[k]。
+3. 将a[i]与a[k]交换
+4. 因为交换前[j,end)逆序，而a[k]又是第一个大于a[i]的数，将a[i]换过来后，[j,i]肯定是逆序，[i,end)也是逆序，所以[j,end)还是逆序的。
+    所以，将a[k]往后的位置重置为升序，只需要将[j,end)上的数逆序就可以。
+5. 如果在步骤1中没有找到相邻元素，说明[begin,end)上都是降序对，则直接将[begin,end)逆序，即执行步骤4
 
 */
 class Solution {
 public:
     void nextPermutation(vector<int>& nums) {
+        int len = nums.size();
+        if (len == 0 || len == 1) {
+            return;
+        }
 
+        int i=len-2,j=len-1;
+        //找到第一个升序对
+        while (i>0 && nums[i] >= nums[j]) {
+            i--;
+            j--;
+        }
+
+        //没找到升序对
+        if (i==0 && nums[i]>=nums[j]) {
+            reverse(nums, 0, len-1);
+        } else {
+
+            //找到了一个升序对，从后往前找到第一个大于nums[i]的数
+            int k = len-1;
+            while (k>=j) {
+                if (nums[k] > nums[i]) {
+                    break;
+                }
+                k--;
+            }
+            //交换i和k
+            swap(nums[i], nums[k]);
+
+            //逆序i之后的数
+            reverse(nums, j, len-1);
+        }
+    }
+
+    void reverse(vector<int>& nums, int i, int j) {
+        cout << "nums len:" << nums.size() << " i:" << i << " j:" << j << endl;
+        while (i<j) {
+            swap(nums[i], nums[j]);
+            i++;
+            j--;
+        }
     }
 };
 int main()
 {
 
     Solution sol;
-    string s = "[{]}";
-    cout << sol.isValid(s)<<endl;
+    vector<int> nums= {1,1,5};
+    sol.nextPermutation(nums);
+    for (auto it:nums) {
+        cout << it<<" ";
+    }
+    cout << endl;
 
     return 0;
 }

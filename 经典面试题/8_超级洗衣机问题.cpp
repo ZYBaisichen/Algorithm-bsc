@@ -39,7 +39,7 @@ public:
        1. ll>0, rr>0: 总需要的轮数是max(ll,rr), 往中间i位置抛
        2. ll>0, rr<0: 总需要的轮数是max(ll,rr), 往rr抛
        3. ll<0, rr>0: 总需要的轮数是max(ll,rr), 往ll抛
-       4. ll<0, rr<0: 两边都需要包裹的时候，就是需要从i往外抛，需要的轮数是arr[i]
+       4. ll<0, rr<0: 两边都需要包裹的时候，就是需要从i往外抛，需要的轮数是|ll|+|rr|，痛点在arr[i]
     对于每个位置i分别求出来，需要的轮数，找到最痛的点O(n)。每轮可以用前缀数组或前缀和加速，为O(1)。总复杂度O(N)
     */
     int findMinMoves(vector<int>& machines) {
@@ -56,10 +56,10 @@ public:
         int left_sum = 0;
         int ans = -1;
         for (int i=0;i<len;i++) {
-            int ll = left_sum - (i*avg);
-            int rr = sum - left_sum - matchines[i] - (len-i-1)*avg;
+            int ll = left_sum - (i*avg); //左边需要扔出或收到的包裹数
+            int rr = sum - left_sum - matchines[i] - (len-i-1)*avg; //右边需要扔出或收到的包裹数
             if (ll < 0 && rr < 0) {
-                ans = max(ans, abs(ll)+abs(rr));
+                ans = max(ans, abs(ll)+abs(rr)); //痛点在matchines[i], 需要扔出去abs(ll)+abs[rr]个包裹
             } else {
                 ans = max(ans, max(abs(ll), abs(rr)));
             }
