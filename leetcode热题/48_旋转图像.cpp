@@ -1,7 +1,7 @@
 /*
  * @Author: baisichen
  * @Date: 2024-02-26 15:02:38
- * @LastEditTime: 2024-06-06 17:32:14
+ * @LastEditTime: 2024-06-06 20:56:31
  * @LastEditors: baisichen
  * @Description:
  */
@@ -66,19 +66,47 @@ public:
             return;
         }
         
-        int i=0,j=0, left_i, right_i, left_j, right_j;
-        vector<int> tmp(n, 0);
+        int i=0,j=0, top_i, buttom_i, top_j, buttom_j;
         while (i<n/2) {
-            left_i = i;
-            left_j = j;
-            right_i = len-i-1; //右下角点
-            right_j = len-j-1;
+            top_i = i;
+            top_j = j;
+            buttom_i = n-i-1; //右下角点
+            buttom_j = n-j-1;
 
-            if (left_i >= right_j || left_j >= right_j) { //走到了最里面，可以结束了
+            if (top_i >= buttom_i || top_j >= buttom_j) { //走到了最里面，可以结束了
                 return;
             }
 
-            for (int k = left_i; k<= right_i)
+
+            int cur_len  = buttom_i - top_i + 1;
+            vector<int> tmp(cur_len, 0);
+
+            //保存第一行
+            for (int k = top_j; k<= buttom_j; k++) {
+                tmp[k] = matrix[top_i][k];
+            }
+
+            //左边的列放在上面一行，从下往上遍历
+            for (int k=buttom_i,kk=top_j;k>=top_i;k--,kk++) {
+                matrix[top_i][kk] = matrix[k][top_j];
+            }
+
+            // 下边的行放在左边一列
+            for (int k=buttom_j,kk=buttom_i;k>=top_j;k--,kk--) {
+                matrix[kk][top_j] = matrix[buttom_i][k];
+            }
+
+            // 右边的列放在下边一行
+            for (int k=top_i,kk=buttom_j;k<=buttom_i;k++,kk--) {
+                matrix[buttom_i][kk] = matrix[k][buttom_j];
+            }
+
+            // 上边的一行放在右边的列
+            for (int k=0,kk=top_i;k<cur_len;k++,kk++) {
+                matrix[kk][buttom_j] = tmp[k];
+            }
+
+            //更新锚点
             i++;
             j++;
         }
@@ -87,10 +115,13 @@ public:
 int main() {
 
     Solution sol;
-    vector<int> nums = {1,2,3};
-    vector<vector<int>> res = sol.permute(nums);
+    vector<vector<int>> nums = {
+        { 1, 2, 3 }, 
+        { 4, 5, 6 }, 
+        { 7, 8, 9 }};
+    sol.rotate(nums);
     cout << "res:" << endl;
-    for (auto it:res) {
+    for (auto it:nums) {
         for (auto it2:it) {
             cout << it2 << " ";
         }
