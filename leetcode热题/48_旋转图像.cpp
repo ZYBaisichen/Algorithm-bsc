@@ -1,7 +1,7 @@
 /*
  * @Author: baisichen
  * @Date: 2024-02-26 15:02:38
- * @LastEditTime: 2024-06-06 20:56:31
+ * @LastEditTime: 2024-06-07 11:17:01
  * @LastEditors: baisichen
  * @Description:
  */
@@ -60,6 +60,23 @@ n == matrix.length == matrix[i].length
 */
 class Solution {
 public:
+    void print_matrix(vector<vector<int>>& matrix) { 
+        int n = matrix.size();
+        int m = matrix[0].size();
+        for (int i=0;i<n;i++) {
+            for (int j=0;j<m;j++) {
+                cout << matrix[i][j] << " ";
+            }
+            cout << endl;
+        }
+        cout << endl;
+    }
+    void print_arr(vector<int>& arr) {
+        for (int i=0;i<arr.size();i++) {
+            cout << arr[i] << " ";
+        }
+        cout << endl;
+    }
     void rotate(vector<vector<int>>& matrix) {
         int n = matrix.size();
         if (n <= 1) {
@@ -72,6 +89,7 @@ public:
             top_j = j;
             buttom_i = n-i-1; //右下角点
             buttom_j = n-j-1;
+            // cout << "top_i:"<< top_i << " top_j:" << top_j <<  " buttom_i:" << buttom_i << " buttom_j:" << buttom_j <<endl;
 
             if (top_i >= buttom_i || top_j >= buttom_j) { //走到了最里面，可以结束了
                 return;
@@ -82,29 +100,39 @@ public:
             vector<int> tmp(cur_len, 0);
 
             //保存第一行
-            for (int k = top_j; k<= buttom_j; k++) {
-                tmp[k] = matrix[top_i][k];
+            for (int k = top_j, tmp_idx=0; k<= buttom_j; k++, tmp_idx++) {
+                tmp[tmp_idx] = matrix[top_i][k];
             }
+            // print_arr(tmp);
 
+            // print_matrix(matrix);
             //左边的列放在上面一行，从下往上遍历
-            for (int k=buttom_i,kk=top_j;k>=top_i;k--,kk++) {
+            for (int k=buttom_i,kk=top_j;k>top_i;k--,kk++) {
+                // cout << "top_i:" << top_i << " kk:" << kk << " k:" << k << " top_j:" << top_j << endl;
                 matrix[top_i][kk] = matrix[k][top_j];
             }
+            // print_matrix(matrix);
 
             // 下边的行放在左边一列
-            for (int k=buttom_j,kk=buttom_i;k>=top_j;k--,kk--) {
+            for (int k=buttom_j,kk=buttom_i;k>top_j;k--,kk--) {
+                // cout << " kk:" << kk << " topj:" << top_j << " buttomi:" << buttom_i << " k:" << k << endl;
                 matrix[kk][top_j] = matrix[buttom_i][k];
             }
+            // print_matrix(matrix);
 
             // 右边的列放在下边一行
-            for (int k=top_i,kk=buttom_j;k<=buttom_i;k++,kk--) {
+            for (int k=top_i,kk=buttom_j;k<buttom_i;k++,kk--) {
+                // cout << " buttom_i:" << buttom_i << " kk:" << kk << " k:" << k << " buttomj:" << buttom_j << endl;
                 matrix[buttom_i][kk] = matrix[k][buttom_j];
             }
+            // print_matrix(matrix);
 
             // 上边的一行放在右边的列
-            for (int k=0,kk=top_i;k<cur_len;k++,kk++) {
+            for (int k=0,kk=top_i;k<cur_len-1;k++,kk++) {
+                // cout << "kk:" << kk << " buttom_j:" << buttom_j  << " k:" << k << " tmp[k]:" << tmp[k] << endl;
                 matrix[kk][buttom_j] = tmp[k];
             }
+            // print_matrix(matrix);
 
             //更新锚点
             i++;
@@ -115,10 +143,7 @@ public:
 int main() {
 
     Solution sol;
-    vector<vector<int>> nums = {
-        { 1, 2, 3 }, 
-        { 4, 5, 6 }, 
-        { 7, 8, 9 }};
+    vector<vector<int>> nums = {{5, 1, 9, 11}, {2, 4, 8, 10}, {13, 3, 6, 7}, {15, 14, 12, 16}};
     sol.rotate(nums);
     cout << "res:" << endl;
     for (auto it:nums) {
