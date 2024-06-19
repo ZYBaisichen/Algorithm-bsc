@@ -1,8 +1,8 @@
 /*
  * @Author: baisichen
  * @Date: 2024-02-26 15:02:38
- * @LastEditTime: 2024-06-19 11:49:08
- * @LastEditors: baisichen
+ * @LastEditTime: 2024-06-20 00:26:47
+ * @LastEditors: baisichen baisichen@baidu.com
  * @Description:
  */
 #include <iostream>
@@ -77,26 +77,38 @@ class Solution {
 public:
     vector<string> removeInvalidParentheses(string s) {
         int len = s.length();
-        vector<string> res = {""};
         if (len == 0) {
-            return res; 
+            return {""}; 
         }
         int cnt = 0;
         string path = "";
-        process(s, 0, cnt, path, res);
+        set<string> res_set;
+        res_set.insert("");
+        process(s, 0, cnt, path, res_set);
+        vector<string> res;
+        for (auto it:res_set) {
+            res.push_back(it);
+        }
         return res;
     }
     //0...i-1已经决定了是否保存, 且当前的左括号的数量是cnt，往下递归枚举每个位置取或者不取，这个过程始终需要cnt>=0
     //顺利到达最后的位置, 如果此时cnt为0，说明产生了一个结果。
-    void process(string& s, int i, int cnt, string& path, vector<string>& res) {
+    void process(string& s, int i, int cnt, string& path, set<string>& res) {
         cout << "i:" << i << " s.length():" << s.length()<< " path:" << path << " cnt:" << cnt << endl;
-        if (i>=s.length()) {
+        if (i>s.length()) {
             return;
         }
-        if (i==s.length()) {
+        if (i==s.length() && path.length() != 0) {
             cout << "res path:" << path << " cnt:" << cnt << endl;
             if (cnt==0) {
-                res.push_back(path);
+                if (path.length() > res.begin()->length()) {
+                    cout << "res path:" << path << " res.begin():" << *res.begin() << endl;
+                    res.clear();
+                    cout << "res:" << res.size() << endl;
+                    res.insert(path);
+                } else if (path.length() == res.begin()->length()) {
+                    res.insert(path);
+                }
             }
         }
 
@@ -120,6 +132,7 @@ public:
             path = path.substr(0, path.length()-1);
         }
     } 
+
 };
 // Your Codec object will be instantiated and called as such:
 // Codec ser, deser;
@@ -133,7 +146,7 @@ int main()
     Solution sol;
     string s = "()())()";
     auto res = sol.removeInvalidParentheses(s);
-    cout << "res:" << endl;
+    cout << "res_size:" << res.size() << " res:" << endl;
     for (auto it:res) {
         cout << it << " ";
     }
