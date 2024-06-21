@@ -70,6 +70,19 @@ https://leetcode.cn/problems/house-robber-iii/description/
      TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
      TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
  };
+ /**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+
+
 class Solution {
 public:
     struct info {
@@ -81,7 +94,24 @@ public:
         }
     };
     int rob(TreeNode* root) {
+        if (!root) {
+            return 0;
+        }
+        info res = process(root);
+        return max(res.yes, res.no);
+    }
+    info process(TreeNode* root) {
+        if (!root) {
+            return info(0,0);
+        }
+        
+        info left = process(root->left);
+        info right = process(root->right);
 
+        int yes = root->val + left.no + right.no; //打劫当前节点
+        int no = max(left.yes, left.no) + max(right.yes, right.no); //不打劫当前节点
+        // cout << "root:" << root->val << " yes:" << yes << " no:" << no << endl;
+        return info(yes, no); 
     }
 };
 
