@@ -65,6 +65,7 @@ public:
                     Node* cur_fail = cur->fail;
                     while (cur_fail != nullptr) {
                         // 父节点的fail链，走到的节点的下一条路有到i的，则链接上
+                        // 间接判断了fail指针指向的下一个节点是否等于i(字符)
                         if (cur_fail->nexts[i] != nullptr) {
                             cur->nexts[i]->fail = cur_fail->nexts[i];
                             break; //贪心，找到最长的前缀，就跳出
