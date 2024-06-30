@@ -1,7 +1,7 @@
 /*
  * @Author: baisichen
  * @Date: 2024-02-26 15:02:38
- * @LastEditTime: 2024-06-30 16:14:12
+ * @LastEditTime: 2024-06-30 22:49:57
  * @LastEditors: baisichen
  * @Description:
  */
@@ -81,7 +81,7 @@ public:
         }
     }
     //快速排序
-    void quik_sort(vector<int>& arr) {
+    void quick_sort(vector<int>& arr) {
         int len = arr.size();
         if (len == 0) {
             return;
@@ -89,17 +89,20 @@ public:
         process(arr, 0, len-1);
     }
     void process(vector<int>& arr, int l, int r) {
+        cout << "begin:l:" << l << " r:" << r << endl;
         if (l>=r) {
             return;
         }
         int rand_idx = l + (rand() % (r-l+1));
-        swap(arr[rand_idx], arr[r]); //将锚点交换到最后
         int left = -1, right = -1;//锚点上下界
+        // cout << "rand:" << arr[rand_idx]  << " idx:" << rand_idx << endl;
         partition(arr, l, r, left, right, arr[rand_idx]);
+        // cout <<"l:" << l << " r:" << r <<" right:"<< right << " left:" << left << " rand_idx:" << rand_idx << " pivot:" << arr[rand_idx] << endl;
         process(arr, l, left-1);
-        process(arr, l, right+1);
+        process(arr, right+1, r);
     }
     void partition(vector<int>& arr, int l, int r, int& left, int& right, int pivot) {
+        // cout << "partition:" << l << " r:" << r << " pivot:" << pivot << endl;
         if (l>r) {
             return;
         }
