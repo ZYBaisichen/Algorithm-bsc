@@ -56,31 +56,65 @@ https://leetcode.cn/problems/generate-parentheses/description/
 */
 class Solution {
 public:
-    vector<string> generateParenthesis(int n) {
+    vector<string> generateParenthesis1(int n) {
         if (n == 0) {
             return vector<string>();
         }
 
         string path="";
         vector<string> res;
-        process(n,0,0,path,res);
+        process1(n*2,0,0,path,res);
         return res;
     }
 
-    void process(int n, int i, int cnt, string& path, vector<string>& res) {
+    void process1(int n, int i, int cnt, string& path, vector<string>& res) {
         if (i == n) {
             if (cnt == 0) {
                 res.push_back(path);
             }
         }
         path += '('; //添加左括号
-        process(n, i+1, cnt+1, path, res);
+        process1(n, i+1, cnt+1, path, res);
         path = path.substr(0, path.length());
         //添加右括号
         if (cnt - 1 >= 0) {
             path += ')'; //添加左括号
-            process(n, i+1, cnt-1, path, res);
+            process1(n, i+1, cnt-1, path, res);
             path = path.substr(0, path.length());        
+        }
+    }
+
+
+    //这个减枝剪的更彻底一点。
+    //因为process1中需要枚举左括号到2*n长度才回溯，其实没有必要枚举到最后
+    vector<string> generateParenthesis(int n) {
+        if (n==0) {
+            return {};
+        }
+        string path="";
+        vector<string> res;
+        process(n, 0, 0, path, res);
+        return res;
+    }
+
+    void process(int n,int l,int r, string& path,vector<string>& res) {
+        // cout << "===begin l:" << l  << " r:" << r << " path:" << path << " n:" << n << endl;
+        if (r == n) {
+            if (l==r) {
+                res.push_back(path);
+            }
+            return;
+        }
+        if (l<n) {
+            path += "(";
+            process(n, l+1, r, path, res);
+            path.pop_back();
+        }
+        if (r<l) {
+            path += ")";
+            // cout << "l:" << l << " r:" << r+1 << " path:" << path << endl;
+            process(n, l, r+1, path, res);
+            path.pop_back(); 
         }
     }
 };
