@@ -40,6 +40,7 @@ public:
         // cout << "before_sub path:" << path<<endl;
         generatePermutationCore(s,res,path,cur+1);
         path = path.substr(0, path.length()-1);
+        //path.pop_back();
         // cout << "path:" << path<<endl;
     }
 };
