@@ -61,6 +61,7 @@ public:
     }
 
 
+    //dp[i]表示字符串[i...len]范围上，有多少种方案
     int numberDp(string s) {
         int len = s.length();
         if (len==0) {
