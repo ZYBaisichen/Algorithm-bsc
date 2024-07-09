@@ -82,6 +82,7 @@ public:
         // }
         // cout << endl;
         int ans = INT_MAX;
+        // 枚举每一个纸条
         for (int i = 0; i < stickers_map.size(); i++)
         {
             // 第一个字符必须在纸条中才开始，不然这个纸条没有意义，会无限循环
@@ -90,7 +91,7 @@ public:
             {
                 continue;
             }
-            // 枚举每一个纸条
+            //当前纸条可以解决的tmp字符串中的数量， tmp是rest的词频统计
             string res_tmp = "";
             for (int j = 0; j < 26; j++)
             {
