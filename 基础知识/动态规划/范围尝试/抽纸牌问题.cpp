@@ -28,6 +28,7 @@ public:
 
         return max(f(arr, 0, len - 1), s(arr, 0, len - 1));
     }
+    //在l..r范围上先手拿，得到的最高分数
     int f(vector<int> &arr, int l, int r)
     {
         if (l>arr.size() || r<0) {
@@ -40,8 +41,9 @@ public:
         }
         int left = arr[l] + s(arr, l + 1, r);
         int right = arr[r] + s(arr, l, r - 1);
-        return max(left, right);
+        return max(left, right); //因为是先手拿，肯定是拿较大的分数
     }
+    //l到r范围上后手拿，得到的最高分数
     int s(vector<int> &arr, int l, int r)
     {
         if (l > arr.size() || r < 0)
@@ -55,7 +57,7 @@ public:
         }
         int left=f(arr, l + 1, r);
         int right=f(arr, l, r - 1);
-        return min(left, right);
+        return min(left, right); //因为我是后手拿，所以先手肯定不会让我拿较大的值
     }
 
     int winDp(vector<int> arr)
