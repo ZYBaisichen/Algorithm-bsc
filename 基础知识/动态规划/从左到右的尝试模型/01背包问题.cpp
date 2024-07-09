@@ -5,7 +5,7 @@
 /*
  * @Author: baisichen
  * @Date: 2024-02-22 21:05:49
- * @LastEditTime: 2024-02-26 11:04:29
+ * @LastEditTime: 2024-07-09 11:58:36
  * @LastEditors: baisichen
  * @Description:
  */
@@ -28,7 +28,7 @@ public:
     }
     // 将i...的物品在使用啦alreadyW重量后放入bag中产生的最大价值
     // 正着想，用了多少空间
-    //复杂度O(2^N)
+    // 复杂度O(2^N)
     int process1(vector<int> &w, vector<int> &v, int index, int alreadyW, int bag)
     {
         if (alreadyW > bag)
@@ -83,26 +83,57 @@ public:
             return 0;
         }
         vector<vector<int>> dp(w_len + 1, vector<int>(bag + 1, 0));
-        for (int i = w_len-1; i >= 0; i--)
+        for (int i = w_len - 1; i >= 0; i--)
         {
             for (int rest = bag; rest >= 0; rest--)
             {
-                cout << "i:" << i << " rest:" << rest<< endl;
+                cout << "i:" << i << " rest:" << rest << endl;
                 int no = dp[i + 1][rest];
                 int yes = 0;
-                if (rest >= w[i]) {
+                if (rest >= w[i])
+                {
                     yes = v[i] + dp[i + 1][rest - w[i]];
                 }
                 dp[i][rest] = std::max(no, yes);
             }
         }
-        for (int i = 0; i < w_len; i++) {
-            for (int rest = 0; rest <= bag; rest++) {
+        for (int i = 0; i < w_len; i++)
+        {
+            for (int rest = 0; rest <= bag; rest++)
+            {
                 cout << dp[i][rest] << " ";
             }
             cout << endl;
         }
         return dp[0][bag];
+    }
+
+    // 根据递归改造成动态规划版本
+    // 复杂度O(n*bag)
+    int processDp_youhua(vector<int> w, vector<int> v, int bag)
+    {
+        int w_len = w.size();
+        int v_len = v.size();
+        if (bag <= 0 || w_len == 0 || v_len == 0)
+        {
+            return 0;
+        }
+        vector<int> dp(bag + 1, 0);
+        for (int i = w_len - 1; i >= 0; i--)
+        {
+            for (int rest = bag; rest >= 0; rest--)
+            {
+                cout << "i:" << i << " rest:" << rest << endl;
+                int no = dp[rest];
+                int yes = 0;
+                if (rest >= w[i])
+                {
+                    yes = v[i] + dp[rest - w[i]];
+                }
+                dp[rest] = std::max(no, yes);
+            }
+        }
+        return dp[bag];
     }
 };
 int main()
@@ -135,6 +166,7 @@ int main()
     int ans0 = sol.process1(w, v, 0, 0, bag);
     int ans1 = sol.process2(w, v, 0, bag, bag);
     int ans2 = sol.processDp(w, v, bag);
-    cout << "ans0:" << ans0 << ", ans1:" << ans1 << " ans2: " << ans2 << endl;
+    int ans3 = sol.processDp_youhua(w, v, bag);
+    cout << "ans0:" << ans0 << ", ans1:" << ans1 << " ans2: " << ans2 << " ans3:" << ans3<< endl;
     cout << "测试结束" << endl;
 }
