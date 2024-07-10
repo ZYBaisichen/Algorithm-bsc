@@ -90,6 +90,8 @@ public:
 };
 class dijkstra {
 public:
+    //反向证明证明dijkstra的正确性：
+    // 假设a到d的直接距离是100，假设存在一条路径，经过其他节点到d更短，根据dijkstra算法，每次都从最短路径开始更新，肯定不会遗漏掉
     map<Node*, int> process(Graph* graph, Node* start_node) {
         map<Node*, int> distanceMap;
         distanceMap[start_node] = 0; //距离当前节点距离为0
@@ -100,9 +102,11 @@ public:
             int distance = distanceMap[curMinNode];
             for (int i=0;i<edge_len;i++) {
                 Node* to_node = curMinNode->edges[i]->to;
+                //不存在到to_node节点的路径，则发现了一条路径
                 if (distanceMap.find(to_node) == distanceMap.end()) {
                     distanceMap[to_node] = distance + curMinNode->edges[i]->value;
                 } else {
+                    //经过当前curMinNode节点到达to_node，如果距离更短，则更新。
                     distanceMap[to_node] = std::min(distanceMap[to_node], distance + curMinNode->edges[i]->value);
                 }
             }
