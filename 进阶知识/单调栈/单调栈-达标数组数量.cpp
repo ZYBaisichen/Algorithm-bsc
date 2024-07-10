@@ -24,6 +24,7 @@ public:
         int r=0;
         int ans = 0;
         // cout << "len: " << len << endl;
+        // 假设找到了[0...5]的答案，完全没必要再看1..2了，只需要直接从[1..6]开始看
         for (int l=0; l< len; l++) {
             while (r<len) {
                 // cout << "r:" << r << endl;
@@ -49,7 +50,7 @@ public:
             }
             // cout << "ans:" << ans << " l:" << l << " r:" << r << endl;
 
-            //收集答案
+            //收集答案，产生了r-l个达标数组
             ans += r-l;
 
             //l即将过期，出队

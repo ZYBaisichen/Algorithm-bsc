@@ -74,6 +74,7 @@ public:
     int get_max_dingzhi_sum(vector<int> &arr)
     {
         int len = arr.size();
+        //以当前元素为最小值的数组，最左不会越过第一个比它小的值，最右不会越过第一个比它小的值。
         vector<vector<int>> nearless_res(len, vector<int>(2, -1));
         get_nearless_repeat(arr, nearless_res);
 

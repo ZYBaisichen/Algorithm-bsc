@@ -27,7 +27,7 @@ public:
     {
         return process1(x, y, k);
     }
-    // 要到达x，y，还有rest步可以走，有多少种走法
+    // 要到达(0,0)位置，当前在(x，y)，还有rest步可以走，有多少种走法
     // x最大是8，y最大是9
     int process1(int x, int y, int rest)
     {
