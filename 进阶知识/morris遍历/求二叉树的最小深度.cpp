@@ -36,6 +36,7 @@ public:
 
     //需要知道遍历到cur时候，cur的高度
     //需要判断哪个节点是否是叶节点：第二次到达时，判断most_right的左树是否为空，为空则表示most_right为叶节点，其高度就是要用来pk的高度
+    //用一个cur_level记录当前节点所在的深度
     int morris(TreeNode* root) {
         if (!root) {
             return 0;

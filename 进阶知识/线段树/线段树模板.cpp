@@ -71,7 +71,8 @@ public:
     }
 
     void push_up(int rt)
-    {
+    {   
+        //左右数孩子的累加和
         sum[rt] = sum[rt << 1] + sum[rt << 1 | 1];
     }
 
@@ -115,6 +116,11 @@ public:
     // 向孩子传递lazy和更新信息
     void push_down(int rt, int l_num, int r_num)
     {
+        //更新优于lazy累加
+        /*
+        add、update，最后一个操作是update会让lazy数组清零。可以正确运行
+        update,add,update,add, 会在add的时候调用push_down将前面的update先下发。
+        */
         if (has_update[rt])
         {
             cout << "push_down: rt:" << rt << " ln:" << l_num << "rn:" << r_num << " change[rt]:" << change[rt] << endl;
@@ -152,7 +158,7 @@ public:
             // cout << "update: " << L << " " << R << " " << C << " " << l << " " << r << " " << rt << endl;
             // cout << "cur_change:" << change[rt] << endl;
             sum[rt] = C * (r - l + 1);
-            lazy[rt] = 0;
+            lazy[rt] = 0; //既然都改成了C，lazy数组也就清零了
             return;
         }
 

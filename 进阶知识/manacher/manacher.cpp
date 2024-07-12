@@ -55,7 +55,7 @@ public:
                         p[cur] = p[cur_tmp];
                     } else if (l_cur_tmp < l) { //最多扩到右边界
                         p[cur] = r - cur + 1;
-                    } else {
+                    } else { //至少扩到右边界
                         int count = r - cur +1;
                         int l_tmp = cur - (count-1) -1;
                         int r_tmp = r+1;
