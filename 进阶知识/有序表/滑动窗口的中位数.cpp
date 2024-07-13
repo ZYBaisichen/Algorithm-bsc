@@ -94,7 +94,7 @@ public:
         void put(int idx, int value)
         {
             K key(idx, value);
-            root = add(root, key);
+            root = add(root, key); //add完之后返回新的头
         }
 
         SBTNode<K> *add(SBTNode<K> *cur, K& key)
@@ -179,6 +179,7 @@ public:
                 { // 左右孩子都有的情况，让后继节点代替自己
                     SBTNode<K> *pre = nullptr;
                     SBTNode<K> *last_node = cur->right;
+                    //后继节点是右孩子的最左节点
                     last_node->size--;
                     while (last_node->left != nullptr)
                     {
@@ -383,7 +384,7 @@ public:
                 else
                 {
                     // 否则在右子树上。往右边寻找
-                    // 注意这时左边已经找到了m个节点，在右边需要减去已经找到的节点
+                    // 注意这时左边已经找到了m个节点，在右边需要减去已经找到的节点和cur自己
                     k = k - (cur->left ? cur->left->size : 0) - 1;
                     cur = cur->right;
                 }

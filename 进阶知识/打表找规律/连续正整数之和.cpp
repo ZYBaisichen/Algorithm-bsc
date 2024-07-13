@@ -18,9 +18,6 @@
 
 using namespace std;
 
-// 草一共有n的重量，两只牛轮流吃草，A牛先吃，B牛后吃
-// 每只牛在自己的回合，吃草的重量必须是4的幂，1、4、16、64....
-
 // 判断一个数字是否是若干数量(数量>1)的连续正整数的和
 class Solution
 {
@@ -52,7 +49,7 @@ public:
         if (num == 0 || num==1) {
             return false;
         }
-        int ss = (num-1)&num;
+        int ss = (num-1)&num; //当为2的某次方时不能被连续整数累加
         // cout << "num:" << num - 1 << "," << num << ":" << ss << endl;
         if ( ((num-1)&num) == 0) {
             return false;

@@ -41,6 +41,7 @@ public:
         if (key < other_key) {
             return true;
         }
+        //key是null时也是大于other_key的
         return false;
     }
 
@@ -68,7 +69,7 @@ public:
         size = 1; //初始只有head一个节点
         leve_up = 10;
     }
-
+    //level_num可以手动设置有几层，便于调试
     void put(K key, V value, int level_num=-1) {
         //找到最右的比key小的节点
         SkipListNode<K, V>* pre = most_right_less_node_in_tree(key);
@@ -83,7 +84,7 @@ public:
             std::srand(std::time(0));
             double randomValue = static_cast<double>(std::rand()) / (static_cast<double>(RAND_MAX) + 1.0);
             if (level_num == -1) {
-                //摇骰子，一直摇到出现1位置
+                //摇骰子，一直摇到出现1为止
                 while (randomValue < probability && new_node_level < leve_up) {
                     new_node_level++;
                     std::srand(std::time(0));
