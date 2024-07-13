@@ -170,7 +170,7 @@ public:
         {
             return res;
         }
-        // 离散化
+        // x轴上位置离散化
         map<int, int> pos_id;
         get_pos_compression(positions, pos_id);
         // for (auto iter : pos_id)
