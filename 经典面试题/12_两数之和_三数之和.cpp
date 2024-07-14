@@ -73,6 +73,7 @@ public:
                 {
                     if (i == 0) {
                         //跳过重复数字。 nums[l]如果和nums[l-1]一样的话，则它产生的答案都已经在nums[l-1]的时候出现过了。
+                        //当l是i+1时，l-1=i是枚举的第一个数，而第一个数应该是nums[i-1]!=nums[i]判断，所以这里应该判断第二个数是否重复即可
                         if (l == i+1 || (nums[l - 1] != nums[l])) {
                             vector<int> tmp = {nums[l], nums[r], nums[i]};
                             res.push_back(tmp);
