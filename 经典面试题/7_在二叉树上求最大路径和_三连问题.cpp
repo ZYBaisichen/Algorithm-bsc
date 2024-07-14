@@ -14,7 +14,7 @@ using namespace std;
 
 /*
 1. 路径必须从头结点出发，到叶结点为止，返回最大路径之和
-2. 路径可以从任意节点出发，到达任意节点为止，返回最大路径之和
+2. 路径可以从任意节点出发，只能向下到达任意节点为止，返回最大路径之和
 3. 路径可以从任意节点出发，到任意节点为止，返回最大路径之和： https://leetcode.cn/problems/binary-tree-maximum-path-sum/submissions/514028323/
 
 */
@@ -45,7 +45,7 @@ public:
     /*
     第一个问题：
     1. 可以逐步向下传递当前加和到了哪里
-    2. 也可以采用二叉树递归套路，拿到做孩子路径最大为多少，然后拿到右孩子最大路径为多少。
+    2. 也可以采用二叉树递归套路，拿到左孩子路径最大为多少，然后拿到右孩子最大路径为多少。
     */
     int maxPathSum_1(TreeNode *root)
     {
@@ -135,8 +135,6 @@ public:
 
     /*
     第三个问题：
-    /*
-    第三个问题：
     1. x无关的时候，
         a. 求左树最大路径
         b. 求右树最大路径
@@ -180,18 +178,21 @@ public:
             p2 = right->all_max;
         }
 
-
+        //只root自己
         int p3 = root->val;
+        //只往左延伸
         int p4 = INT_MIN;
         if (left != nullptr) {
             p4 = left->head_max + root->val;
         }
 
+        //只往右延伸
         int p5 = INT_MIN;
         if (right != nullptr) {
             p5 = right->head_max + root->val;
         }
 
+        //往两边延伸
         int p6 = INT_MIN;
         if (left != nullptr && right != nullptr) {
             p6 = left->head_max + right->head_max + root->val;
