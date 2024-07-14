@@ -272,6 +272,7 @@ public:
         print_arr(dc3.height, "height:");
         int ans = 0;
         for (int i=0;i<len;i++) {
+            //找到lcp数组中最大的值，即最长公共前缀，也是最长公共子串
             ans = max(ans, dc3.height[dc3.rank[i]]);
         }
         return ans;
