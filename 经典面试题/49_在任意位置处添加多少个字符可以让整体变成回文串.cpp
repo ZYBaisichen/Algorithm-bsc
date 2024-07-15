@@ -196,7 +196,7 @@ public:
                 cur_dp = dp[i+1][j];
             }
             // cout << "tmp:" << tmp << endl;
-            if (tmp == 0) { //左边，现决定[i...j-1]，再补s[j]
+            if (tmp == 0) { //左边，先决定[i...j-1]，再补s[j]
                 res[idx] = s[j];
                 res[ss_len-idx-1] = s[j];
                 // cout << "left:s[i]:" << s[i] << " s[j]:" << s[j] << " idx:" << idx << " ss_len-idx-1:" << ss_len - idx - 1 << " res:"<< res<< endl;

@@ -48,7 +48,7 @@ public:
         return process1(d,p, 0, 1);
     }
     //来到了idx，[0...idx-1]都已经决定好要不要贿赂了，并得到了ability能力
-    //返回[idx...len]决定之后需要的最小钱数
+    //返回[idx...len]通关之后需要的最小钱数
     int process1(vector<int>& d, vector<int>& p, int idx, int ability) {
         int len = d.size();
         if (idx == len) { //没有怪兽了
@@ -79,6 +79,7 @@ public:
         for (int i=0;i<len;i++) {
             sum_ability += d[i]; 
         }
+        //dp[i][j]代表0...i-1已经决定好，[i...len-1]上通关怪兽在当前能力是j的情况下，所花费的最小钱数
         vector<vector<int>> dp(len + 1, vector<int>(sum_ability+1, INT_MAX));
         //填最后一行
         for (int j = 0; j <= sum_ability;j++) {
@@ -131,7 +132,7 @@ public:
                 return -1; //不能通过
             }
         }
-        //1. 要想通过当前怪兽，上一个怪兽如果花费money-p[i]，则当前怪兽刚好花费p[idx]就可以通过
+        //1. 要想通过当前怪兽，上一个怪兽如果花费money-p[i]，则当前怪兽刚好花费p[i]就可以通过
         ll cur_ability = -1;
         int ability1 = -1;
         if (money-p[idx]>=0) {
@@ -174,7 +175,7 @@ public:
             for (int j=0;j<=sum_money;j++) {
                 // 1、不管当前能力值够不够，都直接买。切必须是前一个怪兽花费j-p[i]
                 if (j-p[i]>=0 && dp[i-1][j-p[i]] != -1) {
-                    dp[i][j] = dp[i-1][j-p[i]] + d[i];
+                    dp[i][j] = dp[i-1][j-p[i]] + d[i]; //前一个花费j-p[i]当前花费p[i]获得的最大能力
                 }
                 // 2. 前一个怪兽花了j元，能力够了，则本次不用再买了
                 if (dp[i-1][j] >= d[i]) {

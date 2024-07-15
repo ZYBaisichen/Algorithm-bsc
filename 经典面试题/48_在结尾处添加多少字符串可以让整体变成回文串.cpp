@@ -44,7 +44,6 @@ public:
         }
         return res;
     }
-    //d为怪兽的能力值。p是贿赂每只怪兽的价格
     string add_shortest_char(string s) {
         int len = s.length();
         if (len==0) {
