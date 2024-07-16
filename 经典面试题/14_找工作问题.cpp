@@ -34,6 +34,7 @@ public:
         money = _money;
     }
     // 重载 < 运算符以定义比较逻辑  
+    //难度越大，越在后面
     bool operator<(const Job& other) const {  
         return hard < other.hard;  
     } 
@@ -42,8 +43,6 @@ public:
 class Solution
 {
 public:
-    //首先想法是，暴力枚举所有的数值对
-    //然后对数值对排序，排序完成后找到第k小（下标为k-1）的数值对
     vector<int> find_job(vector<Job> &jobs, vector<int>& arr) {
         int lenj = jobs.size();
         int lena = arr.size();
@@ -62,7 +61,7 @@ public:
         });
 
         //现在jobs数组中，按照难度升序排列。难度相同的报酬高的在前面
-        //将所有难度想听报酬最高的放到有序表中
+        //将所有难度相同报酬最高的放到有序表中
         multiset<Job> m_set;
         Job* pre = &jobs[0];
         m_set.insert(*pre); //上一组难度的组长入表
@@ -81,6 +80,7 @@ public:
         }
 
         for (int i=0;i<lena;i++) {
+            //找到难度大于等于arr[i]，且最接近arr[i]的数
             auto it = m_set.lower_bound(Job(arr[i], 0));
             cout << "it:" << it->hard << endl;
             if (it != m_set.end()) {
@@ -92,7 +92,7 @@ public:
                         res[i] = it->money;
                     }  
                 }
-            } else { //没有找到难度大于等于arr[i]的工作。则挑选最后一份工作给他
+            } else { //没有找到难度大于等于arr[i]的工作。则挑选最后一份工作给他。（挑选最难的工作）
                 res[i] = m_set.rbegin()->money;
             }
         }

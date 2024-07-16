@@ -54,6 +54,7 @@ public:
             // cout << "asfsdf" <<endl;
             return INT_MAX;
         }
+        //到达自己，活的grid[0][0]的分数
         if (i==0 && j==0) {
             return grid[0][0];
         }
@@ -116,6 +117,7 @@ public:
         if (m==0) {
             return 0;
         }
+        //dp[i][j]表示从(0,0)到达(i，j）的路径和
         vector<vector<int>> dp(n, vector<int>(m, INT_MAX));
         dp[0][0] = grid[0][0];
         //根据递归逻辑，依赖上方和左边的元素，所以从上到下，从左到右填格子

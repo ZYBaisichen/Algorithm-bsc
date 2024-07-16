@@ -115,12 +115,12 @@ public:
     //从idx开始往上做调整
     void heap_insert(int idx)
     {
-        int parent  = (idx - 1) >> 2;
+        int parent  = (idx - 1) >> 1;
         int cur = idx;
         while (parent >= 0 && arr[parent]->count > arr[cur]->count) {
             swap(parent, cur);
             cur = parent;
-            parent = (idx - 1) >> 2;
+            parent = (cur - 1) >> 1;
         }
     }
 
@@ -135,7 +135,7 @@ public:
 class Solution
 {
 public:
-    // 给定一个字符串类型的数组arr， 求其中出现次数最多的前K个。
+    // 给定一个字符串类型的数组arr， 求其中出现次数最多的前K个。注意这里假设的是arr是流式过来的，一开始不能统计所有词的词频
     /*
     实现如下结构:
     class TopRecord{

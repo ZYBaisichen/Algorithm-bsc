@@ -49,7 +49,7 @@ public:
         while ((end = str.find('#', start)) != std::string::npos) {
             string cur_str = str.substr(start, end - start);
             cout << "str:" << str << " end:" << end << " start:" << start << " cur_str:"<< cur_str << endl;
-            Node* next_node = new Node(cur_str); //将这条路的str也存到奥node中一份
+            Node* next_node = new Node(cur_str); //将这条路的str也整体存到node中一份
             if (cur->next.find(cur_str) == cur->next.end()) {
                 cur->next[cur_str] = next_node;
             }

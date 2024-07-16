@@ -104,7 +104,7 @@ public:
         int ans = 0;
         for (int move = 31; move >= 0 && cur != nullptr; move--)
         {
-            // 去除当前sum的高位状态
+            // 获得第move位状态
             int path = (cur_num >> move) & 1;
             // cout << "cur_path:" << path << " move:" << move << endl;
             // 最高位如果是1的话为负数，期望需要1，异或成0变成正数; 如果高位为0，期望遇到0。最高位期望遇到相同的数字
@@ -114,6 +114,7 @@ public:
             // 实际在前缀树上的数字
             if (cur->next[best] != nullptr || cur->next[best ^ 1] != nullptr) {
                 // 如果cur->next[best]->min > aim也不可能走到bes路径
+                //这里应该有问题，如果经过best的min比aim大，best^1也有可能比aim大
                 best = (cur->next[best] == nullptr||cur->next[best]->min > aim) ? (best ^ 1) : best;
                 // cout << "best:" << best << endl;
 

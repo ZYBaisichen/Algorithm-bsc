@@ -74,6 +74,7 @@ public:
         if (len==0) {return 0;}
 
         vector<vector<ll>> dp(len + 1, vector<ll>(big+1, 0));
+        //dp[i][j]表示i...len-1范围上放入容量为j的容量里有几种放法
         for (int i=0;i<=big;i++) {
             dp[len][i] = 1;
         }
@@ -113,7 +114,7 @@ public:
         }
 
         for (int i=len-1;i>=0;i--) { //更新len轮
-            for (int j=bag;j>=0;j--) {
+            for (int j=bag;j>=0;j--) { //一定要从右往左
                 dp[j] = dp[j]; //首先等于前一行的值，即不放第i个物品
                 if (arr[i] <= j) {
                     dp[j] += dp[j-arr[i]];

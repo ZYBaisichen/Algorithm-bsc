@@ -44,7 +44,7 @@ public:
     }
 
     /*
-    流程：
+    贪心流程：
     准备变量cur和max，初始cur=0， max=INT_MIN。从左到右遍历
     1. 当遍历到i位置时，将nuns[i]加到cur上，如果cur大于max则更新max
     2. 如果cur加到了0以下，则将cur重置为0

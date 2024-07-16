@@ -148,7 +148,7 @@ public:
         // dp[i]表示从i...end能切出来多少回文串
         // f[i]依赖f[i+1]到f[len-1]，所以从后往前填
         // 如果i...end是回文串时，dp[i] = min(dp[i], dp[end+1])
-        vector<int> dp(len + 1, 1999); // 字符串长度最长是2000，所以最少分隔成1999次
+        vector<int> dp(len + 1, 1999); // 字符串长度最长是2000，所以最多分隔1999次
         dp[len] = 0;                   // 最后一个字符不需要分隔
 
         for (int i = len - 1; i >= 0; i--)

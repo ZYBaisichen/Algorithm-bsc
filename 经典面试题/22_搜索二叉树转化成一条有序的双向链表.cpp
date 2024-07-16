@@ -59,7 +59,7 @@ public:
     }
     void dfs(Node* root) {
         if (!root) return;
-        dfs(root->left);
+        dfs(root->left); //先展开左边
         if (!pre) {
             head = root;
             pre=head;
@@ -68,7 +68,7 @@ public:
         }
         root->left=pre;
         pre = root;
-        dfs(root->right);
+        dfs(root->right); //再展开右边
     }
 };
 

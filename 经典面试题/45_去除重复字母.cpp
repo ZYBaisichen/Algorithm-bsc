@@ -97,7 +97,7 @@ public:
             }
         }
         string front;
-        front = s[min_idx];
+        front = s[min_idx]; //选择一个。后面的选择递归
         // cout << "min_idx:" << min_idx << " front:" << front << endl;
         // cout << "min_idx:" << min_idx + 1 << " last str len:" << len - min_idx - 1 << endl;
         // cout << s.substr(min_idx + 1, len - min_idx - 1) << endl;

@@ -79,7 +79,7 @@ public:
         int ans = 0;
         for (int move = 31; move >= 0 && cur != nullptr; move--)
         {
-            // 去除当前sum的高位状态
+            // 拿到第move位的状态
             int path = (cur_num >> move) & 1;
             // cout << "cur_path:" << path << " move:" << move << endl;
             // 最高位如果是1的话为负数，期望需要1，异或成0变成正数; 如果高位为0，期望遇到0。最高位期望遇到相同的数字

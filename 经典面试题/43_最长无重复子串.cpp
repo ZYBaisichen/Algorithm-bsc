@@ -62,7 +62,7 @@ public:
             cout << "s[j]:" << s[j] << endl;
             if (map_tmp.find(s[j]) == map_tmp.end()) {
                 map_tmp[s[j]] = j;
-                res= max(res, j-i+1);   
+                res= max(res, j-i+1); //这里其实越过了[i+1..j],[i+2..j]，因为已经求得了[i...j]所以就没有必要再求这些范围了
                 j++;
             } else {
                 int old_i = i;

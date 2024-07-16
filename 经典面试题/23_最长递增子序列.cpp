@@ -53,12 +53,12 @@ public:
         vector<int> ends(len+1, 0); //ends[i]表示，长度为i+1的子序列，最后一个元素的最小值
         dp[0] = 1;
         ends[0] = nums[0];
-        int e_right = 0;
+        int e_right = 0; //记录ends数组最右边有效的数所在的位置
         int res = 1;
         for (int i=1;i<len;i++) {
             int l = 0, r=e_right, mid=l+((r-l)>>1);
             //二分找到第一个大于等于nums[i]的数，假设这个数是b
-            //b前面的数c（所在位置为d）其实也是找到了一种长度为d+1的递增序列，但因为nums[i]比c大，所以不会更新c
+            //b前面的数c（所在位置为d）其实也是找到了一种长度为d+1的递增序列，但因为nums[i]比c大，需要在c上累加1，所以不会更新c，而是更新b。
             int ans = -1;
             while (l<=r) {
                 // cout << "l:" << l << " r:" << r << " mid:" << mid << endl;
