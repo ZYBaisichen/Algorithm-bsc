@@ -89,7 +89,7 @@ public:
                 // print_st(st);
                 // cout << endl;
                 cur=0;//遇到运算符，清算当前数字
-            } else { //遇到了做括号
+            } else { //遇到了左括号
                 vector<int> bra = value(str, i + 1);
                 cur = bra[0];//抓到计算结果
                 i=bra[1]+1; //从下一个位置开始处理

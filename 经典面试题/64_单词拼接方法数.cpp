@@ -119,7 +119,7 @@ public:
             int ways = 0;
             for (int end = i; end < str.length(); end++)
             {   
-                //这是O(N)的，可以使用前缀树降成O(1)
+                //这里查找字符串，如果不可忽略的话，是O(N)的，可以使用前缀树降成O(1)
                 string pre = str.substr(i, end - i + 1);
                 if (_sets.find(pre) != _sets.end())
                 {

@@ -55,7 +55,7 @@ public:
    返回到右下角需要的最少血量
    */
    int process(vector<vector<int>>& matrix, int n, int m, int i,int j) {
-        if (i==n-1 && j==m-1) { //准备登录右下角
+        if (i==n-1 && j==m-1) { //准备登录右下角。如果需要掉血，则需要当前-matrix[i][j]+1的血量
             return matrix[i][j] < 0 ? -matrix[i][j]+1 : 1;
         }
 
@@ -105,7 +105,7 @@ public:
         }
         /*
         i从0到n-1,j从0到m-1
-        dp[i][j]代表准备登录i,j，并存储从当前位置到达右下角位置的最低血量
+        dp[i][j]代表准备登录i,j，并存储从当前位置到达右下角位置，需要的最低血量
         依赖i+1,j+1，所以从下往上，从右往左填格子
         */
 
@@ -138,7 +138,7 @@ public:
         }
 
         for (int i=n-2;i>=0;i--) {
-            for(int j=n-2;j>=0;j--) {
+            for(int j=m-2;j>=0;j--) {
                 
                 int min_need = min(dp[i + 1][j], dp[i][j+1]);
                 // cout << "i:" << i << "," << j << " val:" << matrix[i][j] << " min_need:" << min_need<< endl;

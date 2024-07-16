@@ -87,9 +87,9 @@ public:
         }
         // cout << "asdfasd===" << endl;
         if (l==-1) { //左边先耗尽
-            return (no_used+1)/2 + (len-r) + solved; //标记叉号的两个人一条船（向上取证），右侧还有(ln-r)个人没有搞定，一人一条船。再加上配对好的。
+            return (no_used+1)/2 + (len-r) + solved; //标记叉号的两个人一条船（向上取整），右侧还有(len-r)个人没有搞定，一人一条船。再加上配对好的。
         } else {
-            return (l+1 + no_used + 1)/2 + solved; //左侧每走到的人数有l+1个，标记叉号的有no_used个，总人数相加除2向上取整。再加上配对好的
+            return (l+1 + no_used + 1)/2 + solved; //左侧没走到的人数有l+1个，标记叉号的有no_used个，总人数相加除2向上取整。再加上配对好的
         }
     }
 };

@@ -82,7 +82,7 @@ public:
         // 所以还需要再统计一遍
         for (int i = 0; i < len; i++)
         {
-            if (cand_map.find(nums[i]) != cand_map.end()) { //候选血量增加
+            if (cand_map.find(nums[i]) != cand_map.end()) { //只统计候选数
                 cand_map[nums[i]]++;
                 if (cand_map[nums[i]]>len/k) {
                     res.push_back(nums[i]);

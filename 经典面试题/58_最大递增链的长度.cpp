@@ -1,7 +1,7 @@
 /*
  * @Author: baisichen
  * @Date: 2024-02-26 15:02:38
- * @LastEditTime: 2024-04-02 18:21:39
+ * @LastEditTime: 2024-07-16 11:55:39
  * @LastEditors: baisichen
  * @Description:
  */
@@ -38,7 +38,7 @@ class Solution
 public:
     /*
     暴力：
-        从每个位置出发(n*m)，上下左右递归走(n*m)得到一个答案，求最大的，复杂度是O(n^2*m^2)
+        从每个位置出发(n*m)，上下左右递归走(n*m)得到一个答案，求最大的，复杂度是O((n*m)*(n*m))
     */
     int max_increase_path(vector<vector<int>>& matrix) {
         int n= matrix.size();
@@ -120,19 +120,35 @@ public:
         int next4 = 0;
         //上
         if (i-1>=0 && matrix[i-1][j]>matrix[i][j]) {
-            next1 = process2(matrix, i-1, j,dp);
+            if (dp[i-1][j] != -1) {
+                next1 = dp[i-1][j];
+            } else {
+                next1 = process2(matrix, i-1, j,dp);
+            }
         }
         //下
         if (i+1<n && matrix[i+1][j]>matrix[i][j]) {
-            next2 = process2(matrix, i+1, j,dp);
+            if (dp[i+1][j] != -1) {
+                next2 = dp[i+1][j];
+            } else {
+                next2 = process2(matrix, i+1, j,dp);
+            }
         }
         //左
         if (j-1>=0 && matrix[i][j-1]>matrix[i][j]) {
-            next3 = process2(matrix, i, j-1,dp);
+            if (dp[i][j-1] != -1) {
+                next3 = dp[i][j-1];
+            } else {
+                next3 = process2(matrix, i, j-1,dp);
+            }
         }
         //右
         if (j+1<m && matrix[i][j+1]>matrix[i][j]) {
-            next4 = process2(matrix, i, j+1,dp);
+            if (dp[i][j+1] != -1) {
+                next4 = dp[i][j+1];
+            } else {
+                next4 = process2(matrix, i, j+1,dp);
+            }
         }
 
         int ans = 1 + max(max(next1, next2), max(next3, next4));

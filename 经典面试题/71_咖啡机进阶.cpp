@@ -78,7 +78,7 @@ public:
         for (int i=0;i<m;i++) {
             Node* node = _min_priority_queue.top();
             _min_priority_queue.pop();
-            res[i] = node->start+node->work_time;
+            res[i] = node->start + node->work_time;
             node->start += node->work_time; //将工作时间累加到当前节点的开始时间上
             _min_priority_queue.push(node);
         }

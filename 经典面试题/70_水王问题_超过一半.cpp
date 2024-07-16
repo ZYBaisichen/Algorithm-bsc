@@ -29,6 +29,27 @@ using namespace std;
 著名的水王问题：
 https://blog.csdn.net/qq_45173404/article/details/117809364
 
+仓库管理员以数组 stock 形式记录商品库存表。stock[i] 表示商品 id，可能存在重复。请返回库存表中数量大于 stock.length / 2 的商品 id。
+
+ 
+
+示例 1:
+
+输入: stock = [6, 1, 3, 1, 1, 1]
+输出: 1
+ 
+
+限制：
+
+1 <= stock.length <= 50000
+给定数组为非空数组，且存在结果数字
+ 
+
+注意：本题与主站 169 题相同：https://leetcode-cn.com/problems/majority-element/
+超级水王问题：给你一个数组，出现次数大于数组长度的一半的元素称之为水王数，怎么能快速找到水王数？
+
+内存限制：时间复杂度O(n)，额外空间复杂度O(1)——也就是遍历数组的次数为有限次，申请的变量数为有限个
+
 */
 
 

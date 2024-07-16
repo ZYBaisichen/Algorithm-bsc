@@ -58,7 +58,7 @@ int maxProfit(vector<int>& prices) {
         if (len==0) return 0;
         int ans = 0;
         int min_price = prices[0];
-        //在最低点买入，在最高点卖出。允许在位置买入在i位置卖出
+        //在最低点买入，在最高点卖出。允许在i位置买入在i位置卖出
         for (int i=0;i<len;i++) {
             ans = max(prices[i]-min_price, ans);
             min_price = min(min_price, prices[i]);

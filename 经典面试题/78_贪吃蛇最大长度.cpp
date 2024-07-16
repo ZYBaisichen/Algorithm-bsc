@@ -102,6 +102,7 @@ public:
         int nn = m.size();
         int mm = m[0].size();
         //两张表，一张不使用能力，一张使用能力
+        //used[i][j]表示来到i,j之后使用了能力的情况下，贪吃蛇最大长度
         vector<vector<int>> not_used(nn, vector<int>(mm, -1));
         vector<vector<int>> used(nn, vector<int>(mm, -1));
 

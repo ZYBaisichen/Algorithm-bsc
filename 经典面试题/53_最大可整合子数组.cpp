@@ -49,13 +49,13 @@ public:
 
         set<int> _sets;
         int ans = 0;
-        //枚举每个子数组
+        //枚举每个子数组的左边界
         for (int l=0;l<len;l++) {
 
             int cur_max_num = arr[l];
             int cur_min_num = arr[l];
             _sets.clear();
-            _sets.insert(arr[l]);
+            _sets.insert(arr[l]); //窗口内元素
             for (int r = l + 1; r < len; r++) {
                 if (_sets.find(arr[r]) != _sets.end()) { //有重复数组了，以arr[l]开头的子数组不可能是可整合数组了
                     break;

@@ -65,7 +65,8 @@ public:
         //     cout << t[i] << " ";
         // }
         // cout << endl;
-
+        
+        //最终t保存的就是只出现一次的数的k进制，转化为10进制返回
         int base = 1;
         int res = 0;
         for (int i = 0; i < 32; i++)
