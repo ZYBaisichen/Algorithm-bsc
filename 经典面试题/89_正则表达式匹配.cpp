@@ -159,7 +159,7 @@ public:
         // p没有来到结尾，但s来到了结尾
         if (i == lens)
         {
-            int ans = j + 1 < lenp && p[j + 1] == '*' && process1(s, p, i, j + 2, dp);
+            int ans = j + 1 < lenp && p[j + 1] == '*' && process1(s, p, i, j + 2, dp); //必须是字符和*的间隔
             dp[i][j] = ans;
             return ans;
         }
@@ -294,6 +294,7 @@ public:
             return false;
         }
 
+        //dp[i][j]表示s[i...]能不能被p[j...]匹配上
         vector<vector<bool>> dp(s.length() + 1, vector<bool>(p.length() + 1, false));
 
         // 最后一列，只有同时到达时才可能匹配上

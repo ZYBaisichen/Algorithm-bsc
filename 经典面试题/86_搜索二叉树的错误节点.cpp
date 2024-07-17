@@ -147,8 +147,8 @@ public:
 // 以下的方法，提交leetcode是通过不了的，但那是因为leetcode的验证方式有问题
 	// 但其实！以下的方法，才是正路！在结构上彻底交换两个节点，而不是值交换
 	public static TreeNode recoverTree2(TreeNode head) {
-		TreeNode[] errs = getTwoErrNodes(head);
-		TreeNode[] parents = getTwoErrParents(head, errs[0], errs[1]);
+		TreeNode[] errs = getTwoErrNodes(head); //获得错误节点
+		TreeNode[] parents = getTwoErrParents(head, errs[0], errs[1]); //获得错误节点的父节点
 		TreeNode e1 = errs[0];
 		TreeNode e1P = parents[0];
 		TreeNode e1L = e1.left;
@@ -158,7 +158,7 @@ public:
 		TreeNode e2L = e2.left;
 		TreeNode e2R = e2.right;
 		if (e1 == head) {
-			if (e1 == e2P) {
+			if (e1 == e2P) { //e1是e2的父亲，交换位置。右因为e1是头，所以只有一个逆序对，e1在前e2在后
 				e1.left = e2L;
 				e1.right = e2R;
 				e2.right = e1;
@@ -197,7 +197,7 @@ public:
 				e2.right = e1R;
 			}
 			head = e1;
-		} else {
+		} else { //普遍位置
 			if (e1 == e2P) {
 				if (e1P.left == e1) {
 					e1P.left = e2;
@@ -226,7 +226,7 @@ public:
 					e1.left = e2;
 					e1.right = e2R;
 				}
-			} else {
+			} else { //不挨着，谁也不是谁的父亲
 				if (e1P.left == e1) {
 					if (e2P.left == e2) {
 						e1.left = e2L;

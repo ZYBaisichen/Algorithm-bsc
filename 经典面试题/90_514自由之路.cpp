@@ -1,7 +1,7 @@
 /*
  * @Author: baisichen
  * @Date: 2024-02-26 15:02:38
- * @LastEditTime: 2024-05-10 20:46:59
+ * @LastEditTime: 2024-07-17 19:27:50
  * @LastEditors: baisichen
  * @Description:
  */
@@ -188,7 +188,16 @@ public:
 
         vector<vector<int>> dp(len+1, vector<int>(len_k+1, INT_MAX));
 
-        return min_step_dp(0, 0, key, _map, len, dp);
+        int ans = min_step_dp(0, 0, key, _map, len, dp);
+        // cout << "baoli:" << endl;
+        // for (int i=0;i<=len;i++) {
+        //     for (int j=0;j<=len_k;j++) {
+        //         cout << dp[i][j] << " ";
+        //     }
+        //     cout << endl;
+        // }
+        // cout << endl;
+        return ans;
     }
 
 
@@ -228,8 +237,62 @@ public:
         return ans;
     }
 
-    //因为在递归函数中preidx存在跳变，即可能变小也可能变大，所以还不能直接用整张二维表来搞
     int findRotateSteps_dp(string ring, string key) {
+        int rlen = ring.length();
+        int klen = key.length();
+
+        map<char, set<int>> _map;
+        for (int i = 0; i < rlen; i++)
+        {
+            if (_map.find(ring[i]) != _map.end())
+            {
+                _map[ring[i]].insert(i);
+            }
+            else
+            {
+                _map[ring[i]] = {i};
+            }
+        }
+
+        for (int i = 0; i < klen; i++) {
+            if (_map.find(key[i]) == _map.end()) {
+                return INT_MAX;
+            }
+        }
+
+        //pre_idx取值，0~rlen-1
+        //key_idx取值，0~klen-1
+        //dp[i][j]当前在ring的i位置，得到key[j...]的最小步数
+        vector<vector<int>> dp(rlen+1, vector<int>(klen+1, INT_MAX));
+        //每一列依赖下一列所有的值
+        
+
+        //最后一列
+        for (int i=0;i<=rlen;i++) {
+            dp[i][klen] = 0;
+        }
+
+        for (int j=klen-1;j>=0;j--) {
+            for (int i=0;i<rlen;i++) {
+                auto &pos = _map[key[j]]; //获得当前要解决的字符在ring中的所有位置
+                int ans = INT_MAX;
+                for (auto iter : pos) {
+                    int step = get_step(i, iter, rlen) + 1;
+                    // cout <<"from:" << i << " iter:" <<iter << " step:" << step << endl;
+                    ans = min(ans, dp[iter][j+1] + step);
+                }
+                dp[i][j] = ans;
+            }
+        }
+        // cout << "dp:" << endl;
+        // for (int i=0;i<=rlen;i++) {
+        //     for (int j=0;j<=klen;j++) {
+        //         cout << dp[i][j] << " ";
+        //     }
+        //     cout << endl;
+        // }
+        // cout << endl;
+        return dp[0][0];
     }
 };
 
@@ -241,5 +304,7 @@ int main()
     string key = "godding";
     cout << sol.findRotateSteps_baoli(ring, key) << endl;
     cout << sol.findRotateSteps(ring, key) << endl;
+    cout << sol.findRotateSteps_dp(ring, key) << endl;
+
     return 0;
 }

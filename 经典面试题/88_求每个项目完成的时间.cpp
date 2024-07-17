@@ -174,7 +174,7 @@ public:
     }
 
     Program* pop() { //取出一个项目。注意弹出后要delete
-        Program* head = sde_heap[0];
+        Program* head = sde_heap[0]; //取出在程序员看来优先级最高的项目来做
         auto& pm_queue = pm_heap[head->pm];
         // while (!pm_queue.empty()) {
         //     auto tmp = pm_queue.top();
@@ -192,9 +192,9 @@ public:
         } else {
             // cout << "pop:" << sde_heap.size()  << " pm_heap_size:" << pm_heap.size() << " pm:" << head->pm << " pm_queue:" << pm_queue.size()<< endl;
             // cout << " pm_queue.top():" << pm_queue.top() << endl;
-            sde_heap[0] = pm_queue.top();
+            sde_heap[0] = pm_queue.top(); //这个pm新的项目进来了
         }
-        heapify(0);
+        heapify(0); //新项目进来调整优先级
         return head;
     }
 
@@ -283,7 +283,7 @@ public:
         int finish=0;//任何一个项目做完finish都会加1，达到项目数的时候结束
         vector<int> ans(len);
         while (finish != len) {
-            int sde_wake_time = sde_que.top();//世界线到达第一个员工醒来的时间
+            int sde_wake_time = sde_que.top();//世界时间线到达第一个员工醒来的时间
             sde_que.pop();
             while (!start_queue.empty()) {//如果在这个时间之前润色好的项目都加到bigqueue项目中去
                 if (start_queue.top()->start > sde_wake_time) {
