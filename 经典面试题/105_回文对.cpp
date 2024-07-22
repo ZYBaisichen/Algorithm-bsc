@@ -73,7 +73,7 @@ words[i] 由小写英文字母组成
 另一种角度: 将所有字符串放在map中，对每个字符串:
     1. 枚举其前缀字符串到i位置时，当前缀串[0..i]是回文串时。看map中是否有[i+1...len-1]的逆序，如果有，则将其补在前面整体就构成了回文串。得到一个答案
     2. 枚举其后缀串到i位置，当后缀串[i...len-1]是回文串时。看map中是否有[0...i-1]的逆序，如果有，则补齐到当前字符串后面，整体构成了回文串。得到一个答案
-    3. 复杂度：枚举字符串是O(N)。其前缀串枚举是O(K)，每次需要判断是否是前缀串是否是回文O(K)+逆序O(K)+在map中找O(K)。总复杂度是O(N*K*(3K))即O(N*k^2)
+    3. 复杂度：枚举字符串是O(N)。其前缀串枚举是O(K)，每次需要判断前缀串是否是回文O(K)+逆序O(K)+在map中找O(K)。总复杂度是O(N*K*(3K))即O(N*k^2)
     4. 通过manacher算法求出来回文半径数组，可以将判断是否是回文优化成O(1), 总复杂度O(N*(K+K*(2*k)))=O(N*k^2)
 
 判断前缀串是否是回文串的两种方法：
@@ -102,12 +102,13 @@ public:
             string word = words[i];
             string word_reverse = word;
             std::reverse(word_reverse.begin(), word_reverse.end());
-            if (_map.find(word_reverse) != _map.end()) {
+            if (_map.find(word_reverse) != _map.end()) {//整体逆序
                 if (i != _map[word_reverse]) {
                     unique_res_set.insert({i, _map[word_reverse]});
                     unique_res_set.insert({_map[word_reverse], i});
                 }
             }
+            //word本身是回文串
             if (_map.find("") != _map.end() && word_reverse == word && i != _map[""])
             {
                 unique_res_set.insert({i, _map[""]});
@@ -125,7 +126,7 @@ public:
             cout << endl;
             
             //枚举前缀串.
-            //对于word[i]最多枚举到终点位置，才有可能包含边界。
+            //对于word[i]最多枚举到中点位置，才有可能包含边界。
             //不能包含mid，因为mid如果包含边界，就是整个字符串了，前面已经求过了
             //下面的j其实是在ss上枚举
             for (int j=1;j<mid;j++) { //[0...len-1]已经在上面求过了

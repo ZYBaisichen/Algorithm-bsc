@@ -35,7 +35,7 @@ using namespace std;
 生成一个father表，记录每个节点的父节点是谁。然后对于每两个节点：
     1. 一个往上找，并记录路径。
     2. 另一个也往上找，直到在另一个节点查找的路径包含就找到了
-    3. 这种方法每次都需要网上遍历两遍，假设树退化成链表，每次需要找2*N次，总复杂度是M*2*N,O(M*N)
+    3. 这种方法每次都需要往上遍历两遍，假设树退化成链表，每次需要找2*N次，总复杂度是M*2*N,O(M*N)
 
 
 
@@ -63,15 +63,15 @@ h  i  g  k  l m
         }
     2. 遍历是二叉树的递归遍历，每个节点来到自己3次。如果先遇到b，但是它的问题是e和c，此时还没遇到e和c，则删除b:{e,c}。下次遇到e和c可以知道b已经遍历过了
         之所以即存{b,e}又存{e,b}，就是因为想在遍历过程中不错过问题
-    3. 整体流程：假设答案表里有{e:{f,c},f:{e},c:{e}}
+    3. 整体流程：假设问题表里有{e:{f,c},f:{e},c:{e}}
         a. 先序遍历整个二叉树
         b. 对于节点x，先看x节点在答案表中有没有，处理答案。然后往左遍历，让左边的节点合并成一个集合A返回，然后x与A合并到一起，并打上tag表示这个集合的父节点是x。
             再往右遍历合并成一个集合B返回，让A,X,B全都合并到一起，打上父节点是X的tag，返回给上一层。
-        b. 第一次来到一个位置时，看答案表里有没有待解决的答案。当遍历到e时，查询答案表，发现f所在集合代表点(目前是f自己)还没有被打上父节点tag。
+        b. 第一次来到一个位置时，看问题表里有没有待解决的问题。当遍历到e时，查询问题表，发现f所在集合代表点(目前是f自己)还没有被打上父节点tag。
             先搁置删除e:f这条记录，等下次遇到f时再做处理。同理e:c答案表也删除。
         c. 集合A={b,d,e,h,i,g,k}返回到a时，将a与A合并变成A={a,b,d,e,h,i,g,k}并将其代表节点打上父节点为a的tag。
            注意这里结合A的代表节点不一定是a，因为a往A上合并，肯定是小挂大，所以代表节点还是原来A中的元素。
-        d. 网友遍历到了c，发现还有c:e这个问题没有解决，看e上已经有父节点tag等于a，所以可以知道之前已经遇到过e了。所以c:e的共同父节点就是当前e的父节点tag(a),.
+        d. 网右遍历到了c，发现还有c:e这个问题没有解决，看e上已经有父节点tag等于a，所以可以知道之前已经遇到过e了。所以c:e的共同父节点就是当前e的父节点tag(a),.
         e. 继续往下遍历到了f，发现还有f:e这个问题没有解决。同理它们的最近公共祖先就是e的父节点tag a。
 */
 
@@ -166,6 +166,7 @@ public:
         UnionFind sets(path);
 
         vector<node*> ans(len, nullptr);
+        //构建问题表和位置idx表
         set_queries_ans_set_easy_anwser(querys, query_map, idx_map, ans);
 
         cout << "query_map:" <<endl;
@@ -204,39 +205,39 @@ public:
         if (root == nullptr) {
             return;
         }
-        //先看能不能算出来答案
+        //先看左边能不能算出来答案
         set_answers(root->left, ans, query_map, idx_map, tag_map, sets);
-        if (root->val == 5) {
-            auto root_p = sets.find_parent(root);
-            cout << "==222:" << root_p->val << endl;
-        }
+        // if (root->val == 5) {
+        //     auto root_p = sets.find_parent(root);
+        //     cout << "==222:" << root_p->val << endl;
+        // }
         //跟左边集合合到一起
         sets.unionSet(root, root->left);
-        if (root->val == 5) {
-            auto root_p = sets.find_parent(root);
-            cout << "==222:" << root_p->val << endl;
-        }
+        // if (root->val == 5) {
+        //     auto root_p = sets.find_parent(root);
+        //     cout << "==222:" << root_p->val << endl;
+        // }
         tag_map[sets.find_parent(root)] = root;
-        if (root->val==5) {
-            auto root_p = sets.find_parent(root);
-            // auto root_left_p = sets.find_parent(root->left);
-            cout << "=====" <<endl;
-            // cout << "asaaa:" << root->left->val << endl;
-            // cout << "root_p:" << root_p->val << " root_left_p:" << root_left_p->val << endl;
-            cout << "root_p:" << root_p->val << endl;
-            cout << "tag_map[root_p]->val:" << tag_map[root_p]->val << endl;
-            cout << "=====" <<endl;
-        }
+        // if (root->val==5) {
+        //     auto root_p = sets.find_parent(root);
+        //     // auto root_left_p = sets.find_parent(root->left);
+        //     cout << "=====" <<endl;
+        //     // cout << "asaaa:" << root->left->val << endl;
+        //     // cout << "root_p:" << root_p->val << " root_left_p:" << root_left_p->val << endl;
+        //     cout << "root_p:" << root_p->val << endl;
+        //     cout << "tag_map[root_p]->val:" << tag_map[root_p]->val << endl;
+        //     cout << "=====" <<endl;
+        // }
         set_answers(root->right, ans, query_map, idx_map, tag_map, sets);
         sets.unionSet(root, root->right);
         tag_map[sets.find_parent(root)] = root;
 
-        if (root->val == 5) {
-            auto pp = sets.find_parent(tree_map[3]);
+        // if (root->val == 5) {
+        //     auto pp = sets.find_parent(tree_map[3]);
 
-            cout << "33333:" << pp->val << endl;
-            cout << "33333:" << tag_map[pp]->val << endl;
-        }
+        //     cout << "33333:" << pp->val << endl;
+        //     cout << "33333:" << tag_map[pp]->val << endl;
+        // }
 
         //后序遍历的时候处理root问题，其实前中后续都可以
         //处理root相关的问题
@@ -297,6 +298,7 @@ public:
                 query_map[second].push_back(first);
             }
 
+            //问题的答案填在i位置
             if (idx_map.find(first) == idx_map.end()) {
                 idx_map[first] = vector<int>();
                 idx_map[first].push_back(i);

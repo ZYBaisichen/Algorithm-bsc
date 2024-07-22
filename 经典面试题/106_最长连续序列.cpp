@@ -133,6 +133,7 @@ public:
         2. 同理nums[i]+1如果在map中存在，一定是开头，长度是len=_map[nums[i]+1]。往后可以达到end=nums[i]+1+_map[nums[i]+1]-1
             更新_map[end]+=map[nums[i]]
             _map[start]+=len
+            还是以start开头，此时到达了最后end处
     */
     int longestConsecutive(vector<int>& nums) {
         int len = nums.size();
@@ -150,7 +151,7 @@ public:
                 //如果前后都没有的话，开头和结尾都是num
                 start = num;
                 end = num;
-                //往前合并
+                //往前合并。num-1存在肯定是结尾
                 if (_map.find(num-1) != _map.end()) {
                     start = num-1-_map[num-1]+1;
                     //更新开头和结尾
