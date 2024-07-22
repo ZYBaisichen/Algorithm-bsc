@@ -119,6 +119,7 @@ public:
         next = nullptr;
     }
 };
+//双向链表
 class NodeList {
 public:
     Node* head;
@@ -312,6 +313,7 @@ public:
         NodeList* origin_pre = old_bucket->pre;
         bool empty_flag = modify_bucket(old_bucket);
         NodeList* preBucket =  empty_flag ? origin_pre : old_bucket;
+
         cout << endl<< "##########" << endl;
         cout << "nextBucket:" << nextBucket << " preBucket:" << preBucket << endl;
         if (nextBucket&&nextBucket->head) {
@@ -338,7 +340,7 @@ public:
             tail_bucket = new_bucket; //新建的桶在最后一个，更新tail_bucket
             _buckets[node->key] = new_bucket;
         } else { //此时下一个桶不是空
-            if (nextBucket->head->times == node->times) {
+            if (nextBucket->head->times == node->times) { //频率相同的放在一个桶里
                 //将node扔到下一个桶里
                 nextBucket->add_node(node);
                 _buckets[node->key] = nextBucket;
@@ -361,7 +363,7 @@ public:
         // }
     }
     /*
-    已经删掉一个元素的桶做修改
+    对已经删掉一个元素桶做修改
     1. 如果删掉之后桶不为空，则不做操作
     2. 如果删掉之后桶为空
     */
@@ -372,6 +374,7 @@ public:
         }
 
         //下面就是桶空了
+        //将前面的桶和后面的桶项链
         if (head_bucket == tail_bucket) {
             cout << "dengyu" << endl;
             head_bucket = nullptr;

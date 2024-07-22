@@ -63,7 +63,7 @@ using namespace std;
 二、算法原型
 当竖着三刀固定的情况下，横着只切一刀时，怎么切能让分成的8块中最小值最大。
     1. [0..1]范围上，竖着三刀固定时，只能在0和1之间切(0作为第一部分的最后一个元素)
-    2. [0...2]范围上，竖着3到固定时，可能在0和1之间，也可能在1和2之间。假设最优一刀在k位置
+    2. [0...2]范围上，竖着3刀固定时，可能在0和1之间，也可能在1和2之间。假设最优一刀在k位置
     3. 当在增加一个范围时，即[0..3]上时，这一刀尝试的位置不会比k更靠上。（这里用到了邮局问题中的原型max{min{sum_上，sum_下}}，存在单调性时，不用回退尝试）
 求出来up和down两个数组, up[i]表示0...i范围上固定3刀时的最优一刀下的最小值。down[i]表示i...n范围上固定3刀时的最优一刀下的最小值
 
@@ -139,7 +139,7 @@ public:
         return res;
     }
 
-    //根据这3刀的位置，求出最优答案
+    //根据固定3刀的位置，求出最优答案
     int get_best_dicision(vector<vector<int>>& help, int c1,int c2, int c3) {
         int n = help.size();
         int m = help[0].size();
@@ -155,7 +155,7 @@ public:
             int ans_tmp = INT_MIN;
             for (int j=split;j<=i-1;j++) {//增加一个范围时，肯定比上一个范围时的一刀更靠后
                 int tmp = min(value(help, c1, c2, c3, 0, j), value(help, c1, c2, c3, j+1, i));
-                if (tmp >= ans_tmp) { //往后挪动
+                if (tmp >= ans_tmp) { //发现更优的解，上次切分的位置往后挪动
                     ans_tmp = tmp;
                     split = j;
                 }
@@ -171,7 +171,7 @@ public:
         //当只有第n-1行时，不能切，所以down[n-1]没有意义
         down[n-2] = min(value(help,c1,c2,c3,n-2,n-2), value(help,c1,c2,c3,n-1,n-1)); //[n-2..n-1]
         split = n-1; //[n-2..n-1]范围上切的一刀，下半部分的第一行在n-1位置
-        for (int i=n-3;i>=0;i--) { //求每个up[i]
+        for (int i=n-3;i>=0;i--) { //求每个down[i]。 单个邮局问题
             //从split开始枚举每个位置，最小到i+1
             int ans_tmp = INT_MIN;
             for (int j=split;j>=i+1;j--) {
@@ -190,11 +190,11 @@ public:
         // }
         // cout << endl;
 
-                // 枚举横着中间一刀的位置，注意需要给上一刀留出位置，所以切分后，中间部分的位置至少是1。最多到n-2
+            // 枚举横着中间一刀的位置，注意需要给上一刀留出位置，所以切分后，中间部分的位置至少是1。最多到n-3
         int ans = INT_MIN;
         for (int mid=1;mid<=n-3;mid++) { //中间部分的最后一行最多到n-3，这样[n-2..n-1]才能再来一刀
             //上半部分0...mid，砍一刀的的最优解up[mid]。此时up[mid]是上半部分最优划分下的最小值
-            //上半部分mid+1...n-1，砍一刀的的最优解down[mid+1]。此时down[mid+1]是下半部分最优划分下的最小值
+            //下半部分mid+1...n-1，砍一刀的的最优解down[mid+1]。此时down[mid+1]是下半部分最优划分下的最小值
             //两者取小的，得到当前mid的答案
             int tmp = min(up[mid], down[mid+1]);            
             // cout << "mid:" << mid << " up[mid]:" << up[mid] << " down[mid+1]:" << down[mid+1] << " tmp:" << tmp << endl;

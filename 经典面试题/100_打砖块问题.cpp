@@ -304,7 +304,8 @@ public:
         // cout << "celling_num4: " << celling_num << endl;
         unionSet(i, j, i, j+1);
         // cout << "celling_num5: "<< celling_num << endl;
-        int cur = celling_num;
+        int cur = celling_num; 
+        //如果本身这个砖块是天花板了，celling_num前面已经增加了1。再合并不会把它算进去了，所以不需要再减1
         if (i==0) {
             return cur-pre;
         } else {

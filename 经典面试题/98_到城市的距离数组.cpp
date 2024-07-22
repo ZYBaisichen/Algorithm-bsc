@@ -69,7 +69,7 @@ using namespace std;
         从paths[2]位置开始，2->8->5->7->3 发现paths[3]=-2已经计算出来了，初始distance=2, 依次改paths[7]=-3;paths[5]=-4;paths[8]=-5;paths[2]=-6
 2. 然后将中间距离数组变成统计数组，即paths[i]==j代表距离首都距离为i的城市有j座。比如初始paths=[-2,-1,-2,-1,0,-3,-2]
     1) 从paths[0]开始，init=0, 发现paths[0]是负数，开始循环怼。记录next={0,-2}， 将paths[0]=0。 此时paths = [0,-1,-2,-1,0,-3,-2]
-    2) 来到paths[2]位置，首选记录next={2,-2}，然后执行paths[2]=0;paths[2]++ == 1;。此时paths=[0,-1,1,-1,0,-3,-2]
+    2) 来到paths[2]位置，首先记录next={2,-2}，然后执行paths[2]=0;paths[2]++ == 1;。此时paths=[0,-1,1,-1,0,-3,-2]
     3) 对于next={2,-2}，同样来到paths[2]位置，发现此时它的值已经是非负数了，则直接加，paths[2]=2;next={}。 此时paths=[0,-1,2,-1,0,-3,-2]
     4) 此时因为next为空了，结束了本轮循环怼。
     5) 依次往下遍历做循环怼
@@ -104,7 +104,7 @@ public:
                 }
 
                 int next_tmp = paths[next];
-                paths[next] = last;
+                paths[next] = last; //在path[i]中记录从哪里来的
                 last = next;
                 next = next_tmp;
             }
@@ -135,7 +135,7 @@ public:
             if (paths[i] >= 0) { //首都和已经计算过的跳过
                 continue;
             }
-            int next = -paths[i];
+            int next = -paths[i]; //下一次需要更新到首都距离为next的数，位置在next处
             paths[i] = 0;
             int init_idx = i;
             while (paths[next] < 0) { //小于0一直怼，最后再补

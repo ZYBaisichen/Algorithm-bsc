@@ -71,7 +71,7 @@ typedef unsigned long long ll;
 class Solution {
 public:
     struct info {
-        ll uncovered;//x没有被覆盖，x为头的树最少需要多少相机
+        ll uncovered;//x没有被覆盖，x为头的树最少需要多少相机才能覆盖其他所有节点
         ll covered_no_camera; //x被覆盖，但x上没有相机，x为头的树至少需要多少相机
         ll covered_has_camera; //x被覆盖，且x上有相机，x为头的树至少需要多少相机
         info(ll a, ll b, ll c) {

@@ -40,8 +40,8 @@ https://leetcode.cn/problems/candy/description/?utm_source=LCUS&utm_medium=ip_re
 /*
 1. 当排成一排时，认为开头的小朋友和结尾的小朋友是不可见的，将小朋友得分曲线，画出来可以观察到，波谷只需要分配一个糖果就可以。每上升一次就需要增加一个糖果分配。波顶需要两个方向的上坡取最大值。
     a. 采用两个辅助数组分别表示从右往左，和从左往右的上升坡度。        比如arr=[3,2,1,4,6,2,3,5,2,1,0,9]。
-    b. 从左往右，第一个元素是1，当比左边大时+1， 比左边小或等于时恢复成1。left =[1,1,1,2,3,1,2,3,1,1,1,2]
-    c. 从右往左，第一个元素是1，当比右边大时+1，比右边小或等于时恢复成1. right =[3,2,1,1,2,1,1,4,3,2,1,1]
+    b. 从左往右，第一个元素是1，当比左边大时+1， 比左边小或等于时恢复成1。left =[1,1,1,2,3,1,2,3,1,1,1,2]。 是左边的坡
+    c. 从右往左，第一个元素是1，当比右边大时+1，比右边小或等于时恢复成1. right =[3,2,1,1,2,1,1,4,3,2,1,1]。 是右边的坡
     d. left和right取最大值就是答案，ans[i] = max(left[i],right[i])
 2. 如果得分相同，糖果数也需要相同，则可以将计算left的逻辑改成，比左边大时+1，比左边小时恢复成1，和左边相等时置为相等的糖果
 
@@ -162,7 +162,7 @@ public:
             return 0;
         }
 
-        int idx = next_min_idx(ratings, 0); //找到第一个下降节点
+        int idx = next_min_idx(ratings, 0); //找到第一个波谷节点
         cout << "first idx:" << idx << endl;
         vector<int> data = right_cands_and_base(ratings, 0, idx++);
         cout << "first data:" << data[0] << "," << data[1] << endl;
@@ -170,6 +170,7 @@ public:
         int lbase = 1;//上升期，当前位置需要分配的糖果数
         int next_min;
         int same = 1;
+        //整体循环从第一个上升点开始算
         while (idx < len) {
             cout << "idx:" << idx << " lbase:" << lbase << " ans:" << ans<< " same:" << same << endl;
             if (ratings[idx] > ratings[idx-1]) { //上升
@@ -183,7 +184,7 @@ public:
                 cout << "[little] idx:" << idx << " next_min:" << next_min << " data[0]:"<< data[0] << " data[1]:" <<data[1]  << endl;
                 if (data[1] <= lbase) { //左边上升上来的高度比较高
                     ans += data[0] - data[1];//减去下降的最左边的。因为最高点前面已经加上了，所以这里不用重复加
-                } else {
+                } else { //下降高度比较高，将最高点算到下降高度里。最高点得分lbase算了same次，需要减去。然后最高点新的得分是data[1]*same。然后right_cands_and_base内部计算的时候，也算了一个最高点的得分，所以要将data[1]干掉
                     ans += data[0] - data[1] + data[1]*same - lbase*same; 
                 }
                 idx = next_min;
@@ -221,7 +222,7 @@ public:
             }
         }
         cout << "[cal right] cands:" << cands << " base:" << base << endl;
-        //base为左边的最高得分
+        //base为左边的最高得分，cands为总得分
         return {cands, base};
     }
 };
