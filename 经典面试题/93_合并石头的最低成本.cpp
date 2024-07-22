@@ -1,7 +1,7 @@
 /*
  * @Author: baisichen
  * @Date: 2024-02-26 15:02:38
- * @LastEditTime: 2024-05-14 10:30:29
+ * @LastEditTime: 2024-07-22 13:44:49
  * @LastEditors: baisichen
  * @Description:
  */
@@ -138,7 +138,7 @@ public:
             3. 7 8 9作为第一份，后面的搞出2份
             4. 7 8 9 10作为第一份，后面的搞出2份
 
-            对于第1份来说，1个数是可以搞定，k-1个数是可以搞定的, 2*(k-1)也是可以搞定的
+            对于第1份来说，1个数是可以搞定，k-1个数是可以搞定的, 2*(k-1)也是可以搞定的.(因为(n-1)%(k-1)==0才能合并成1份)
             */
             for (int mid=l;mid<r;mid+=k-1) {
                 int next1 = process(l, mid, 1, arr, k, presum);
@@ -152,7 +152,7 @@ public:
         }
     }
 
-    int mergeStones(vector<int>& stones, int k) {
+    int mergeStones_jiyi(vector<int>& stones, int k) {
         int len = stones.size();
         if ((len-1) % (k-1) > 0) {
             return -1;
@@ -217,6 +217,130 @@ public:
             return ans;
         }
     }
+
+    // 注：这里依赖了[l][r][k]，但下方又依赖了[l][mid][1]，但感觉r和mid之间是有依赖关系的，一开始没想出来
+    // 主要参考题解：https://leetcode.cn/problems/minimum-cost-to-merge-stones/solutions/2206339/he-bing-shi-tou-de-zui-di-cheng-ben-by-l-pnvh/?utm_source=LCUS&utm_medium=ip_redirect&utm_campaign=transfer2china
+    
+    int mergeStones_dp(vector<int>& stones, int k) {
+        int n = stones.size();
+        if ((n-1) % (k-1) > 0) {
+            return -1;
+        }
+        vector<int> presum(n+1, 0);
+        
+        //l，r取值范围是0,,,len-1， k取值1...k
+        vector<vector<vector<int>>> dp(n, vector<vector<int>>(n, vector<int>(k+1, INT_MAX)));
+        for (int i=0;i<n;i++) {
+            presum[i+1] = presum[i] + stones[i];
+            dp[i][i][1] = 0;
+        }
+
+        //填第一维dp[i][j][1]
+        /*
+        dp[3][6][4]依赖以下的最小值
+        dp[3][3][1], dp[4][6][3]
+        dp[3][4][1], dp[5][6][3]
+        dp[3][5][1], dp[6][6][3]
+        l从小到大递归，r也是从小到大，每个l和r，k都会填一遍。
+        以l和r为x和y轴，t为z轴，同一层上l和r只会依赖下面所有的行和前面所有的列，所以可以按照对角线填。
+        每次填一个格子的时候，都把竖着的高都填完。
+        */
+        for (int len=2;len<=n;len++) {
+            for (int l=0;l<n&&l+len-1<n;l++) {
+                int r = l + len - 1;
+                for (int t = 2; t<=k; t++) {
+                    for (int mid=l; mid<r; mid+=(k-1)) {
+                        // cout << "l:" << l << " mid:"<<mid<<" r:" << r << " t:" << endl;
+                        // cout << "dp[l][mid][1]:" << dp[l][mid][1] << " dp[mid+1][r][t-1]:" << dp[mid+1][r][t-1] << endl;
+                        dp[l][r][t] = min(dp[l][r][t], dp[l][mid][1]+dp[mid+1][r][t-1]);
+                    }
+                }
+                dp[l][r][1] = min(dp[l][r][1], dp[l][r][k] + presum[r+1]-presum[l]);
+            }
+        }
+        return dp[0][n-1][1];
+    }
+
+     int mergeStones_dp2(vector<int>& stones, int k) {
+        int n = stones.size();
+        if ((n-1) % (k-1) > 0) {
+            return -1;
+        }
+        vector<int> presum(n+1, 0);
+        
+        //l，r取值范围是0,,,len-1， k取值1...k
+        vector<vector<vector<int>>> dp(n, vector<vector<int>>(n, vector<int>(k+1, INT_MAX)));
+        for (int i=0;i<n;i++) {
+            presum[i+1] = presum[i] + stones[i];
+            dp[i][i][1] = 0;
+        }
+
+        //填第一维dp[i][j][1]
+        /*
+        dp[3][6][4]依赖以下的最小值
+        dp[3][3][1], dp[4][6][3]
+        dp[3][4][1], dp[5][6][3]
+        dp[3][5][1], dp[6][6][3]
+        l从小到大递归，r也是从小到大，每个l和r，k都会填一遍。
+        以l和r为x和y轴，t为z轴，同一层上l和r只会依赖下面所有的行和前面所有的列，所以可以按照对角线填。
+        每次填一个格子的时候，都把竖着的高都填完。
+        这里用的每一层从下到上，从左到右填
+        */
+        for (int l=n-2;l>=0;l--) {
+            for (int r=l+1;r<n;r++) {
+                for (int t = 2; t<=k; t++) {
+                    for (int mid=l; mid<r; mid+=(k-1)) {
+                        // cout << "l:" << l << " mid:"<<mid<<" r:" << r << " t:" << endl;
+                        // cout << "dp[l][mid][1]:" << dp[l][mid][1] << " dp[mid+1][r][t-1]:" << dp[mid+1][r][t-1] << endl;
+                        dp[l][r][t] = min(dp[l][r][t], dp[l][mid][1]+dp[mid+1][r][t-1]);
+                    }
+                }
+                dp[l][r][1] = min(dp[l][r][1], dp[l][r][k] + presum[r+1]-presum[l]);
+            }
+        }
+        return dp[0][n-1][1];
+    }
+
+
+    /*
+    状态优化，在dp中，使用了dp[l][r][t]表示将区间[l,r]的石头堆合并为t堆的最小成本，t的范围是[1,k]。
+    从数学上看，每次合并减少k-1个堆，如果一直合并，则可以合并成(r-l+1-1)%(k-1)+1个堆，且这个堆的数量是小于k的。
+    所以在[l,r]区间最终合并到小于k堆的堆数是固定的。
+    直接使用dp[l][r]表示区间[l,r]合并到不能合并为止时的最小成本，本质上是通过忽略dp方法中一定不无解的状态，加快求解
+
+    初始时：dp[i][i]我都为0，其他状态为最大值
+    dp[l][r]=min(dp[l][p]+dp[p+1][r])。其中l<=p<r
+    如果(r-l)%(k-1)==0, 说明可以合成一堆，则还需要加上sum[l..r]
+    答案是dp[0][n-1]
+
+    */
+    int mergeStones(vector<int>& stones, int k) {
+        int n = stones.size();
+        if ((n-1) % (k-1) > 0) {
+            return -1;
+        }
+        vector<int> presum(n+1, 0);
+        
+        //l，r取值范围是0,,,len-1， k取值1...k
+        vector<vector<int>> dp(n, vector<int>(n,  INT_MAX));
+        for (int i=0;i<n;i++) {
+            presum[i+1] = presum[i] + stones[i];
+            dp[i][i] = 0;
+        }
+
+        for (int l=n-2;l>=0;l--) {
+            for (int r=l+1;r<n;r++) {
+                for (int mid=l; mid<r; mid+=(k-1)) {
+                    dp[l][r] = min(dp[l][r], dp[l][mid]+dp[mid+1][r]);
+                }
+                if ((r-l)%(k-1) == 0) { //说明可以合并成一堆
+                    dp[l][r] += presum[r+1]-presum[l];
+                }
+            }
+        }
+
+        return dp[0][n-1];
+    }
 };
 
 int main()
@@ -226,6 +350,9 @@ int main()
     vector<int> arr={3,2,4,1};
     int k = 4;
     cout << sol.mergeStones_baoli(arr, k) << endl;
+    cout << sol.mergeStones_jiyi(arr, k) << endl;
+    cout << sol.mergeStones_dp(arr, k) << endl;
+    cout << sol.mergeStones_dp2(arr, k) << endl;
     cout << sol.mergeStones(arr, k) << endl;
     return 0;
 }
