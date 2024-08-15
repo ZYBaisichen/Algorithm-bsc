@@ -67,7 +67,7 @@ https://leetcode.cn/problems/next-permutation/description/
 https://leetcode.cn/problems/next-permutation/solutions/80560/xia-yi-ge-pai-lie-suan-fa-xiang-jie-si-lu-tui-dao-/
 核心思想是通过数学观察法得到的。
 下一个排列的定义是：给定数字序列的字典序中下一个更大的排列。如果不存在下一个更大的排列，则将数字重新排列成最小的排列，即升序排列 
-将问题形式化的描述为：给定若干数字，将其组合为一个整数。如果讲这些数字重新排列，以得到更大的数，且尽可能的小。
+将问题形式化的描述为：给定若干数字，将其组合为一个整数。如果将这些数字重新排列，以得到更大的数，且尽可能的小。
                  比如123的下一个更大的数是132，如果没有更大的数，则输出最小数。
 
 
@@ -93,7 +93,7 @@ https://leetcode.cn/problems/next-permutation/solutions/80560/xia-yi-ge-pai-lie-
     此时的a[i]就是需要和后面交换顺序的小数。
 2. 在[j,end)从后往前找到第一个大于a[i]的数，因为[j,end)上是降序，第一个大于a[i]的数就是这个序列中，满足大于a[i]条件的最小的数， 假设这个数是[k]。
 3. 将a[i]与a[k]交换
-4. 因为交换前[j,end)逆序，而a[k]又是第一个大于a[i]的数，将a[i]换过来后，[j,i]肯定是逆序，[i,end)也是逆序，所以[j,end)还是逆序的。
+4. 因为交换前[j,end)逆序，而a[k]又是第一个大于a[i]的数，将a[i]换过来后，a[j...k-1]上的数都大于a[i], a[k+1...end]上的数都小于a[i]。所以[j,i]肯定是逆序，[i,end)也是逆序，所以[j,end)还是逆序的。
     所以，将a[k]往后的位置重置为升序，只需要将[j,end)上的数逆序就可以。
 5. 如果在步骤1中没有找到相邻元素，说明[begin,end)上都是降序对，则直接将[begin,end)逆序，即执行步骤4
 
