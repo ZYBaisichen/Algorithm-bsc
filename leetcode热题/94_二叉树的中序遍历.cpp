@@ -112,6 +112,23 @@ public:
             }
         }
     }
+    //栈实现方法，按照左边界将树拆分
+    vector<int> inorderTraversal_st(TreeNode* root) {
+        vector<int> res;
+        stack<TreeNode*> st;
+        TreeNode* cur=root;
+        while (!st.empty() || cur!=nullptr) {
+            while (cur!=nullptr) {
+                st.push(cur);
+                cur=cur->left;
+            }
+            cur = st.top();
+            st.pop();
+            res.push_back(cur->val);
+            cur = cur->right;
+        } 
+        return res;
+    }
 };
 int main()
 {

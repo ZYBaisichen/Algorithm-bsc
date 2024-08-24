@@ -249,7 +249,8 @@ public:
         if (target > sum || (sum-target)%2!=0) { //得不到一个偶数是sum-target，则一定拼接不成
             return 0;
         }
-        int a = (sum - target) / 2;
+        int a = (sum - target) / 2;  //这里有个巧妙的地方是，数组中都是正数，所以sum一定是大于0，且大于target的，所以sum-target一定是正数，用作初始化vector不会报错
+        //如果使用b=(sum+target)/2，当target时负数时有可能计算出来b是负数，不能用作初始化dp数组
 
         vector<vector<int>> dp(len+1, vector<int>(a+1, 0));
         dp[len][0] = 1;

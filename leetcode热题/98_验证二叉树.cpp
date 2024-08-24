@@ -63,24 +63,66 @@ https://leetcode.cn/problems/validate-binary-search-tree/
 class Solution
 {
 public:
-    bool ans = true;
     TreeNode* pre=nullptr;
+    bool  ans = true;
     bool isValidBST(TreeNode* root) {
+        if (!root) {
+            return true;
+        }
         inorder(root);
         return ans;
     }
-
     void inorder(TreeNode* root) {
         if (!root) {
             return;
         }
+        
+        inorder(root->left);
+        //要遍历root时看前面的节点和自己的值哪个大
         if (pre != nullptr && pre->val >= root->val) {
             ans = false;
             return;
         }
-        inorder(root->left);
-        pre = cur;
+        pre = root;
         inorder(root->right);
+    }
+
+
+    //二叉树递归套路
+    bool isValidBST_info(TreeNode* root) {
+        if(!root) {
+            return true;
+        }
+        info res = isValidBST_core(root);
+        return res.is_bst;
+
+    }
+    struct info {
+        int max_num;
+        int min_num;
+        bool is_bst;
+        bool is_null;
+        info(int m, int n, bool bst, bool null) {
+            max_num = m;
+            min_num = n;
+            is_bst = bst;
+            is_null = null;
+        }
+    };
+    info isValidBST_core(TreeNode* root) {
+        if (!root) {
+            return info(INT_MIN, INT_MAX, true, true);
+        }
+        if (!root->left && !root->right) {
+            return info(root->val, root->val, true, false);
+        }
+        info left = isValidBST_core(root->left);
+        info right = isValidBST_core(root->right);
+        bool is_bst = left.is_bst && right.is_bst && ((left.max_num < root->val && right.min_num > root->val) || (right.is_null && left.max_num<root->val) || (left.is_null && right.min_num>root->val));
+        int max_num = max(right.max_num, max(root->val, left.max_num));
+        int min_num = min(right.min_num, min(root->val, left.min_num));
+        // cout << "root:" << root->val << " max_num:" << max_num << " min_num:" << min_num << " is_bst:" << is_bst<< endl;
+        return info(max_num, min_num, is_bst, false);
     }
     
 };

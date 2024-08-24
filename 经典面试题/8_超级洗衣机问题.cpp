@@ -67,6 +67,79 @@ public:
         }
         return ans;
     }
+
+
+    //自己想的一个版本
+    int findMinMoves2(vector<int>& machines) {
+        int len = machines.size();
+        if (len ==0) {
+            return 0;
+        }
+        int sum = 0;
+        for (auto it:machines) {
+            sum+=it;
+        }
+        if (sum%len != 0) { //肯定不能均分
+            return -1;
+        }
+
+        int one_need = sum/len;
+        /*
+        对于任意位置i。 左边的数量和右边的衣服数量之和实际假设为ln和rn，当前元素是nums[i]。
+        实际左右两边需要的衣服数量是ln_need和rn_need。分几种情况：
+        1. ln<ln_need，rn < rn_need, 两边都少，说明需要自己往出扔衣服，需要abs(nums[i]-one_need)次
+        2. ln<ln_need, rn>rn_need, 左边少，需要从右边往左扔，扔的次数是max(rn-rn_need, abs(one_need-nums[i]))次
+        3. ln>ln_need, rn<rn_need, 右边少，需要从左往右扔，扔的次数是max(ln-ln_need, abs(one_need-nums[i]))次
+        4. ln>ln_need, rn>rn_need, 左右两边都多，说明中间的少，扔的次数是max(ln-ln_need, rn-rn_need)
+        5. ln==ln_need时，rn有可能等于rn_need也有可能小于或大于，总次数需要max(abs(rn-rn_need), abs(one_need-nums[i]))
+        以上几种情况可以合并成max(abs(nums[i]-one_need), abs(rn-rn_need), abs(ln-ln_need))
+
+        使用前缀和，还有后缀和辅助在O(1)时间内拿到左右实际累加和
+        */
+        vector<int> pre_sum(len+1, 0); //0...i范围上的累加和是多少
+        vector<int> bak_sum(len+1, 0); //i...len范围上的累加和是多少
+
+        for (int i=1;i<=len;i++) {
+            pre_sum[i] = pre_sum[i-1] + machines[i-1];
+        }
+
+        for (int i=len-1;i>=0;i--) {
+            bak_sum[i] = bak_sum[i+1] + machines[i];
+        }
+        // cout << "======" << endl;
+
+        int ans = 0, tmp=0;
+        int ln = 0, ln_need=0;
+        int rn = 0, rn_need=0;
+        for (int i=0;i<len;i++) {
+            ln = pre_sum[i];
+            ln_need = i*one_need;
+            rn = bak_sum[i+1];
+            rn_need = (len-i-1)*one_need;
+
+        //     1. ln<ln_need，rn < rn_need, 两边都少，说明需要自己往出扔衣服，需要abs(nums[i]-one_need)次
+        // 2. ln<ln_need, rn>rn_need, 左边少，需要从右边往左扔，扔的次数是max(rn-rn_need, abs(one_need-nums[i]))次
+        // 3. ln>ln_need, rn<rn_need, 右边少，需要从左往右扔，扔的次数是max(ln-ln_need, abs(one_need-nums[i]))次
+        // 4. ln>ln_need, rn>rn_need, 左右两边都多，说明中间的少，扔的次数是max(ln-ln_need, rn-rn_need)
+        // 5. ln==ln_need时，rn有可能等于rn_need也有可能小于或大于，总次数需要max(abs(rn-rn_need), abs(one_need-nums[i]))
+            if(ln < ln_need && rn<rn_need) {
+                tmp = abs(machines[i]-one_need);
+            } else if (ln<ln_need && rn>rn_need) {
+                tmp = max(rn-rn_need, abs(one_need-machines[i]));
+            } else if (ln>ln_need && rn<rn_need) {
+                tmp = max(ln-ln_need,abs(one_need-machines[i]));
+            } else if (ln>ln_need && rn>rn_need) {
+                tmp = max(ln-ln_need, rn-rn_need);
+            } else if (ln == ln_need || rn==rn_need) {
+                tmp = max(abs(rn-rn_need), max(abs(ln-ln_need), abs(one_need-machines[i])));
+            }
+            // cout << "i:" << i << " ln:" << ln << " ln_need:" << ln_need << " rn:" << rn << " rn_need:" << rn_need  << " tmp:" << tmp<< endl;
+            ans = max(ans, tmp);
+        }
+        return ans;
+
+
+    }
 };
 
 int main()

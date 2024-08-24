@@ -115,6 +115,14 @@ public:
     }
 
     // 官方题解的四平方和定理：https://leetcode.cn/problems/perfect-squares/solutions/822940/wan-quan-ping-fang-shu-by-leetcode-solut-t99c/
+
+    /*
+    四平方和定理证明了任意一个正整数都可以被表示为至多四个正整数的平方和。这给出了本题的答案的上界。
+    1. 当n=4^k*(8m+7)时，是4个整数；
+    2. 当不等于时，判断n=a^2+b^2， 可以用两个数表示
+    3. 当n=a^2时，是一个数
+    4. 其他情况是三个数
+    */
     bool  is_perfect_sqrt(int x) {
         int y = sqrt(x);
         return (y * y == x);

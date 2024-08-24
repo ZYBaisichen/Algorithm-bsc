@@ -177,6 +177,35 @@ public:
         }
         return ans;
     }
+
+    //O(N^2)的中心扩展法
+    int countSubstrings(string s) {
+        int len = s.length();
+        if (len ==0) {
+            return 0;
+        }
+        string ss="#";
+        for (int i=0;i<len;i++) {
+            ss+=s[i];
+            ss+="#";
+        }
+
+        int len_ss = ss.length();
+        int l_tmp = 0, r_tmp=0;
+        int ans = 0;
+        for (int i=1;i<len_ss;i++) {
+            l_tmp = i-1;
+            r_tmp = i+1;
+            int count = 1;
+            while (l_tmp >=0 && r_tmp < len_ss && ss[l_tmp] == ss[r_tmp]) {
+                count++;
+                l_tmp--;
+                r_tmp++;
+            }
+            ans += count/2;
+        }
+        return ans;
+    }
 };
 
 int main()

@@ -51,6 +51,8 @@ https://leetcode.cn/problems/move-zeroes/description/
 /*
 类似荷兰国旗问题。维护一个边界是左边确定不是0的右边界.
 往后遍历，当不是0时，往左交换
+
+//因为要保持原数组元素顺序不变，所以要从左往右。不能从右往左
 */
 
 class Solution

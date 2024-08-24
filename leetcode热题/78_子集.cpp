@@ -105,6 +105,53 @@ public:
             path.pop_back();
         }
     }
+
+
+    vector<vector<int>> subsets2(vector<int>& nums) {
+        int len = nums.size();
+        vector<vector<int>> res;
+        if (len == 0) {
+            return res;
+        }
+        res.push_back({});
+
+        for (int size=1;size<=len;size++) {
+            vector<int> path;
+            dfs2(res,path,nums,size,0);
+        }
+
+        return res;
+
+    }
+    void print(vector<int>& path) {
+        cout << "path:" << endl;
+        for (auto it:path) {
+            cout << it << " ";
+        }
+        cout << endl;
+    }
+    /*
+
+    */
+    void dfs2(vector<vector<int>>& res, vector<int>& path, vector<int>& nums, int size, int cur) {
+        print(path);
+        int p_len = path.size();
+        cout << "path_size:" << p_len << " size:" << size << endl;
+        if (p_len == size) {
+            res.push_back(path);
+            return;
+        }
+        int len = nums.size();
+        for (int i=cur;i<len;i++) {
+            //剩余的不够size了，没必要往下枚举了。减枝
+            if (len-i < size-p_len) {
+                return;
+            }
+            path.push_back(nums[i]);
+            dfs2(res,path,nums,size, i+1);
+            path.pop_back();
+        }
+    }
 };
 int main()
 {

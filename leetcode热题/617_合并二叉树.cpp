@@ -121,6 +121,29 @@ public:
         process(cur1->left, pre1, true, cur2->left, pre2);
         process(cur1->right, pre1, false, cur2->right, pre2);
     }
+
+    //简单版本
+    TreeNode* mergeTrees(TreeNode* root1, TreeNode* root2) {
+        root1 = mergeTreesCore(root1, root2);
+        return root1;
+    }
+
+    //将root2往root1上合
+    TreeNode* mergeTreesCore(TreeNode* root1, TreeNode* root2)  {
+        if (!root1) {
+            return root2;
+        }
+        if (!root2) {
+            return root1;
+        }
+
+        //运行到这里说明root1和root2都不为空
+        root1->val += root2->val;
+        root1->left = mergeTreesCore(root1->left, root2->left);
+        root1->right = mergeTreesCore(root1->right, root2->right);
+
+        return root1;
+    }
 };
 
 int main()

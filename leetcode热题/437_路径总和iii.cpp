@@ -26,7 +26,7 @@ using namespace std;
 
 /*
 
-https://leetcode.cn/problems/partition-equal-subset-sum/description/
+https://leetcode.cn/problems/path-sum-iii/submissions/557690571/
 
 给定一个二叉树的根节点 root ，和一个整数 targetSum ，求该二叉树里节点值之和等于 targetSum 的 路径 的数目。
 

@@ -141,6 +141,67 @@ public:
         }
         return ans;
     }
+
+
+    void print_map(map<int,int>& _map, string suff) {
+        cout << suff ;
+        for (auto it:_map) {
+            cout << it.first << "," <<  it.second << " ";
+        }
+        cout <<endl;
+    }
+    /*
+    自认为更清新的版本
+    */
+    int longestConsecutive_new(vector<int>& nums) {
+        int len = nums.size();
+        if (len==0) {
+            return 0;
+        }
+        map<int, int> map1,map2;//分别记录以key为开头和结尾的数组有多长
+        for (int i=0;i<len;i++) {
+            int cur = nums[i];
+            if (map1.find(cur) != map1.end() || map2.find(cur) != map2.end()) {
+                continue;
+            }
+            //先建立长度为1的子子序列
+            map1[cur] = 1;
+            map2[cur] = 1;
+
+            //查看有没有以cur-1为结尾的数组
+            int start = cur;
+            if (map2.find(cur-1) != map2.end()) {
+                start = cur-1 - map2[cur-1] + 1;
+                map2[cur] += map2[cur-1];
+                map2.erase(cur-1);
+                
+                map1[start]+=map1[cur];
+                map1.erase(cur);
+            }
+
+            //查看有没有以cur+1为开头的数组
+            if (map1.find(cur+1) != map1.end()) {
+                int cur_end = cur+1 + map1[cur+1] - 1;
+                int start_end = start + map1[start] -1;
+
+                int start_len = map1[cur+1];
+                map1[start] += map1[cur+1];
+                map1.erase(cur+1);
+
+                map2[cur_end] += map2[start_end];
+                map2.erase(start_end);
+            }
+            // cout << "====i:" << i<<endl;
+            // print_map(map1, "map1:");
+            // print_map(map2, "map2:");
+        }
+
+        int ans = 0;
+        for (auto it:map1) {
+            ans = max(ans, it.second);
+        }
+        return ans;
+    }
 };
 
 int main()

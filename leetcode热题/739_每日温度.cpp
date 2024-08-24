@@ -81,6 +81,26 @@ public:
         }
         return answer;
     }
+    //简洁版
+    vector<int> dailyTemperatures(vector<int>& temperatures) {
+        int len = temperatures.size();
+        if (len==0) {
+            return temperatures;
+        }
+        vector<int> res(len, 0);
+        //单调递减的，弹出时结算
+        stack<int> st; 
+        st.push(0);
+        for (int i=1;i<len;i++) {
+            while (!st.empty() && temperatures[st.top()] < temperatures[i]) {
+                int tmp = st.top();
+                st.pop();
+                res[tmp] = i-tmp; //结算
+            }
+            st.push(i);
+        }
+        return res;
+    }
 };
 
 int main()
