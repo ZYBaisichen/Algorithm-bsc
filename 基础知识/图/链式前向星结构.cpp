@@ -149,6 +149,7 @@ public:
 };
 const int maxn = 101;
 const int maxm = 6001; // 边集最大6001
+//由近及远的扩散。每次拿到距离最近的节点，看能不能更新到其他点的距离
 class dijkstra {
 public:
     struct Edge {

@@ -229,7 +229,7 @@ public:
 	}
 }
 
-
+//从一个点扩散出去。每次弹出临近的最小边，将to节点加到集合中，并将to节点临近的边放在优先队列中
 class Prim
 {
 public:
@@ -376,6 +376,7 @@ public:
 	};
 
 	// 用并查集实现kruskal算法
+	// 每次选最小的边，然后将点加到集合中。
 	static set<Edge*> kruskalMST(Graph* graph) {
 		UnionFind* unionFind = new UnionFind();
 		unionFind->makeSets(graph->nodes);

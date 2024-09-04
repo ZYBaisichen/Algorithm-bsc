@@ -73,6 +73,7 @@ public:
             return 0;
         }
         int len = arr.size();
+        //dp[i][rest]代表i..len-1范围上的钱币拼凑出rest需有多少种可能
         vector<vector<int>> dp(len+1, vector<int>(aim+1, 0));
         dp[len][0] = 1;
         for (int index = len-1; index >= 0; index--) {

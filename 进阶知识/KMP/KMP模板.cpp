@@ -113,7 +113,7 @@ public:
         return y == m ? x - y : -1; // y越界，则表示匹配出来了，x停留在匹配出来的下一个字符，计算首字符返回；否则返回-1.
     }
 
-    void next_array(string s, int m, int* _next)
+    void next_array(string& s, int m, int* _next)
     {
         if (m == 1)
         {
@@ -143,9 +143,76 @@ public:
             }
             else
             {
+                //此时cn为0，i+1位置的next值将从0位置开始匹配.
                 _next[i++] = 0; //cn跳到了0都没有找到相等的，说明没有前缀和后缀相等的串
             }
         }
+    }
+};
+
+
+//以下为C++版本的模版
+class Solution {
+public:
+    int strStr(string haystack, string needle) {
+        int m = needle.length();
+        if (m == 0) {
+            return 0;
+        }
+        int n = haystack.length();
+        if (n==0) {
+            return -1;
+        }
+        vector<int> next(m, 0);
+        next_array(needle, next);
+        for (auto it:next) {
+            cout << it << " ";
+        }
+        cout << endl;
+        // return -1;
+        
+        int x=0, y=0;
+        // sadbutsad
+        //sad
+        //
+        while (x<n && y<m) {
+            cout << "x:" << x << " y:" << y << " hay:" << haystack[x] << " needle:" << needle[y] << endl;
+            if (haystack[x] == needle[y]) {
+                ++x;
+                ++y;
+            } else {
+                if (y > 0) {
+                    y = next[y];
+                } else {
+                    x++;
+                }
+            }
+        }
+        if (y == m) {
+            return x-m;
+        }
+        return -1;
+    }
+    void next_array(string& match, vector<int>& next) {
+        int len = match.length();
+        if (len == 1) {
+            next[0] = 1;
+            return;
+        }
+        next[0] = -1;
+        next[1] = 0;
+        int i=2;
+        int cn = 0; //cn代表求i位置的next值时，next[i-1]的值，即第一次将match[i-1]和match[cn]比较。同时也是next[i-1]的最长前缀和后缀相等的长度
+        while (i<len) {
+            if (match[i-1] == match[cn]) {
+                next[i++] = ++cn; //等于cn+1。同时求i+1的时候cn变成了next[i]
+            } else if (cn > 0) { //还没有跳到头
+                cn = next[cn];
+            } else {
+                next[i++] = 0; //此时cn=0，求i+1的时候从0位置开始比较
+            }
+        }
+        
     }
 };
 int main()
