@@ -101,11 +101,13 @@ public:
         int mid = (l + r) >> 1;
         push_down(rt, mid - l + 1, r - mid); // 传递给下游lazy信息，左右孩子数量传到函数中
 
+        //在[L...mid]上有任务要设置
         if (L <= mid)
         {
             add(L, R, C, l, mid, rt << 1);
         }
 
+        //在[mid+1..R]上有任务要设置
         if (R >= (mid + 1))
         {
             add(L, R, C, mid + 1, r, rt << 1 | 1);
@@ -141,7 +143,7 @@ public:
         { // 当前rt的lazy不为0的话，之前的操作序列最后一个操作一定是add的情况。比如(update、add、update、update、add)
             lazy[rt << 1] = lazy[rt];
             lazy[rt << 1 | 1] = lazy[rt];
-            sum[rt << 1] += lazy[rt << 1] * l_num;
+            sum[rt << 1] += lazy[rt << 1] * l_num; //前文只有[L..R]能全包住[l..r]时，才会有lazy值，所以可以直接往下发
             sum[rt << 1 | 1] += lazy[rt << 1 | 1] * r_num;
             lazy[rt] = 0;
         }
